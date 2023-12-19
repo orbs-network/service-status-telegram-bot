@@ -14,8 +14,8 @@ async function report(walletManagerEndpoint: string) {
     }
 
     const tableOutput = Object.entries(result.data.networks).map(([name, network]) => [
-      `*${name}*`,
-      network.status,
+      `${name.toUpperCase()}`,
+      network.status === 'OK' ? '✅' : network.status,
     ]);
 
     output += `\`\`\`${table(tableOutput, {
