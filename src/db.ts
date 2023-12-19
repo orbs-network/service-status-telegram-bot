@@ -1,5 +1,5 @@
 import sqlite3 from 'sqlite3';
-import { Notification } from './types';
+import { Alert, AlertDb, Notification } from './types';
 
 export class Database {
   private db;
@@ -16,6 +16,15 @@ export class Database {
     `;
 
     this.db.run(createNotificationsTable);
+
+    const createAlertsTable = `
+      CREATE TABLE IF NOT EXISTS alerts (
+        id TEXT PRIMARY KEY NOT NULL,
+        timestamp INTEGER NOT NULL
+      )
+    `;
+
+    this.db.run(createAlertsTable);
   }
 
   async insert(newNotification: Omit<Notification, 'id'>): Promise<boolean> {
@@ -122,6 +131,68 @@ export class Database {
   deleteByChatId(chatId: number): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       this.db.run('DELETE FROM notifications WHERE chatId = ?', [chatId], (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(true);
+      });
+    });
+  }
+
+  getAlertId({ chatId, notificationType, alertType, name }: Alert): string {
+    return `${notificationType}:${alertType}:${chatId}:${name}`;
+  }
+
+  async getAlert(alert: Alert): Promise<AlertDb> {
+    const id = this.getAlertId(alert);
+
+    return new Promise<AlertDb>((resolve, reject) => {
+      this.db.get('SELECT * FROM alerts WHERE id = ?', [id], (err, row: AlertDb) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(row);
+      });
+    });
+  }
+
+  async insertAlert(newAlert: Alert): Promise<boolean> {
+    const id = this.getAlertId(newAlert);
+
+    // Check if alert already exists
+    try {
+      const alert = await this.getAlert(newAlert);
+      if (alert) {
+        return Promise.reject(false);
+      }
+    } catch (err) {
+      // Alert does not exist
+    }
+
+    return new Promise<boolean>((resolve, reject) => {
+      const insert = `
+        INSERT INTO alerts (id, timestamp)
+        VALUES (?, ?)
+      `;
+
+      this.db.run(insert, [id, newAlert.timestamp], (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(true);
+      });
+    });
+  }
+
+  async deleteAlert(id: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      this.db.run('DELETE FROM alerts WHERE id = ?', [id], (err) => {
         if (err) {
           reject(err);
           return;

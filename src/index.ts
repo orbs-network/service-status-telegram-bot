@@ -1,12 +1,13 @@
 import { Telegraf, Context } from 'telegraf';
 import { CallbackQuery, Update } from 'telegraf/types';
 import { config } from './config';
-import WalletManager from './WalletManager';
+import WalletManager from './wallet-manager/WalletManager';
 import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
-import { getDailyReport, subscribe } from './messages';
+import { getAlerts, getDailyReport, subscribe } from './messages';
 import { NotificationType, NotificationTypeNames } from './types';
+import { differenceInHours } from 'date-fns';
 
 if (!config.BotToken) {
   throw new Error('Bot token missing!');
@@ -134,6 +135,38 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
   }
 });
 
+const alertScheduler = new CronJob('0 */1 * * * *', async () => {
+  // Your post_info_proposals_daily logic here
+  console.log('Running alertScheduler...');
+
+  const notifications = await db.getAll();
+
+  for (const { chatId, notificationType } of notifications) {
+    try {
+      const alerts = await getAlerts(notificationType, chatId);
+      for (const alert of alerts) {
+        const existingAlert = await db.getAlert(alert);
+        if (existingAlert) {
+          const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
+          if (diff < 1) {
+            continue;
+          }
+
+          await db.deleteAlert(existingAlert.id);
+        }
+        await bot.telegram.sendMessage(alert.chatId, alert.message, {
+          parse_mode: 'Markdown',
+        });
+        await db.insertAlert(alert);
+        await wait(1000);
+      }
+    } catch (err) {
+      console.log('An error occurred when sending alerts', err);
+      // Handle the error (retry, notify user, etc.)
+    }
+  }
+});
+
 bot.telegram.setMyCommands([
   {
     command: 'walletmanager',
@@ -147,6 +180,7 @@ bot.telegram.setMyCommands([
 
 bot.launch();
 dailyReportScheduler.start();
+alertScheduler.start();
 
 console.log('Orbs Status Bot is up and running!');
 

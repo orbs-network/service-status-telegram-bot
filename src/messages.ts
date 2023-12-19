@@ -1,6 +1,6 @@
 import { Context, Markup } from 'telegraf';
 import { Chat } from 'telegraf/types';
-import WalletManager from './WalletManager';
+import WalletManager from './wallet-manager/WalletManager';
 import { config } from './config';
 import { NotificationType } from './types';
 
@@ -16,6 +16,24 @@ export async function getDailyReport(notificationType: NotificationType) {
     }
     case NotificationType.TWAP:
       return `TWAP report is not setup`;
+  }
+}
+
+export async function getAlerts(notificationType: NotificationType, chatId: number) {
+  switch (notificationType) {
+    case NotificationType.WalletManager: {
+      if (!config.WalletManagerEndpoint) {
+        console.error('Wallet manager endpoint is not configured');
+        return [];
+      }
+
+      return await WalletManager.alerts({
+        walletManagerEndpoint: config.WalletManagerEndpoint,
+        chatId,
+      });
+    }
+    case NotificationType.TWAP:
+      return [];
   }
 }
 

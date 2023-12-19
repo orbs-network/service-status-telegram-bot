@@ -13,3 +13,17 @@ export type Notification = {
   chatId: number;
   notificationType: NotificationType;
 };
+
+export type Alert = {
+  chatId: number;
+  notificationType: NotificationType;
+  alertType: string;
+  message: string;
+  timestamp: number;
+  name: string;
+};
+
+export type AlertDb = {
+  id: string;
+  timestamp: number;
+};

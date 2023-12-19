@@ -4,7 +4,8 @@
     "lib": ["es6"],
     "strict": true,
     "module": "NodeNext",
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "types": ["cypress", "node"]
   },
   "include": ["**/*.ts"]
 }
