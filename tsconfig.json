@@ -5,7 +5,12 @@
     "strict": true,
     "module": "NodeNext",
     "moduleResolution": "nodenext",
-    "types": ["cypress", "node"]
+    "types": ["cypress", "node"],
+    "rootDir": "src",
+    "outDir": "dist",
+    "sourceMap": true,
+    "skipLibCheck": true
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
 }
