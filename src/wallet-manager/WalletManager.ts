@@ -14,13 +14,13 @@ async function report(walletManagerEndpoint: string) {
     }
 
     const tableOutput = Object.entries(result.data.networks).map(([name, network]) => [
-      name,
+      `*${name}*`,
       network.status,
     ]);
 
-    output += table(tableOutput, {
+    output += `\`\`\`${table(tableOutput, {
       border: getBorderCharacters('void'),
-    });
+    })}\`\`\``;
   } catch (error) {
     console.error(error);
 
