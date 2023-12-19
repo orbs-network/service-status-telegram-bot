@@ -4,7 +4,7 @@ import { getBorderCharacters, table } from 'table';
 import { Alert, NotificationType } from '../types';
 
 async function report(walletManagerEndpoint: string) {
-  let output = '';
+  let output = '📊 *WALLET MANAGER*\n\n';
 
   try {
     const result = await axios.get<WalletManagerResponse>(walletManagerEndpoint);
