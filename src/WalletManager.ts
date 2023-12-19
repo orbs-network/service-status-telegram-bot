@@ -1,12 +1,10 @@
 import axios from 'axios';
 
-async function report() {
-  console.log('Starting Wallet Manager Status...');
-
+async function report(walletManagerEndpoint: string) {
   let output = '';
 
   try {
-    const result = await axios.get('https://wallet-manager-1-a1922d7bed1d.herokuapp.com/health');
+    const result = await axios.get(walletManagerEndpoint);
     console.log(result.data);
 
     if (!result.data.networks) {
@@ -22,8 +20,10 @@ async function report() {
   } catch (error) {
     console.error(error);
 
-    if ('message' in error) {
-      output += `\n\n*Error*: ${error.message}\n`;
+    const err = error as Error;
+
+    if (err.message) {
+      output += `\n\n*Error*: ${err.message}\n`;
     } else {
       output += `\n\n*Error*: Unknown error\n`;
     }
