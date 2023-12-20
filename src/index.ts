@@ -1,20 +1,20 @@
 import { Telegraf, Context } from 'telegraf';
 import { CallbackQuery, Update } from 'telegraf/types';
 import { config } from './config';
-import WalletManager from './wallet-manager/WalletManager';
+import { WalletManager } from './wallet-manager';
 import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
-import { NotificationType, NotificationTypeNames } from './types';
+import { Alert, NotificationType, NotificationTypeNames } from './types';
 import { differenceInHours } from 'date-fns';
 
 if (!config.BotToken) {
   throw new Error('Bot token missing!');
 }
 
-const bot = new Telegraf<Context<Update>>(config.BotToken);
-const db = new Database();
+export const bot = new Telegraf<Context<Update>>(config.BotToken);
+export const db = new Database();
 
 bot.start(async (ctx) => {
   try {
@@ -119,11 +119,29 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running dailyReportScheduler...');
 
-  const notifications = await db.getAll();
+  // TODO: get snapshot of data then send to all subscribers
+  const dataSnapshot: Record<NotificationType, string> = {} as Record<NotificationType, string>;
+  const notificationTypes = Object.values(NotificationType);
+  for (const notificationType of notificationTypes) {
+    try {
+      const report = await getDailyReport(notificationType);
+      if (!report) {
+        continue;
+      }
+      dataSnapshot[notificationType] = report;
+    } catch (err) {
+      console.log('An error occurred when sending daily report', err);
+      // Handle the error (retry, notify user, etc.)
+    }
+  }
 
+  const notifications = await db.getAll();
   for (const { chatId, notificationType } of notifications) {
     try {
-      const message = await getDailyReport(notificationType);
+      const message = dataSnapshot[notificationType];
+      if (!message) {
+        continue;
+      }
       await bot.telegram.sendMessage(chatId, message, {
         parse_mode: 'Markdown',
       });
@@ -139,11 +157,11 @@ const alertScheduler = new CronJob('0 */1 * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running alertScheduler...');
 
-  const notifications = await db.getAll();
-
-  for (const { chatId, notificationType } of notifications) {
+  const notificationTypes = Object.values(NotificationType);
+  for (const notificationType of notificationTypes) {
     try {
-      const alerts = await getAlerts(notificationType, chatId);
+      const alerts = await getAlerts(notificationType);
+
       for (const alert of alerts) {
         const existingAlert = await db.getAlert(alert);
         if (existingAlert) {
@@ -154,11 +172,19 @@ const alertScheduler = new CronJob('0 */1 * * * *', async () => {
 
           await db.deleteAlert(existingAlert.id);
         }
-        await bot.telegram.sendMessage(alert.chatId, alert.message, {
-          parse_mode: 'Markdown',
-        });
+        const notifications = await db.getByNotificationType(notificationType);
+        for (const { chatId } of notifications) {
+          try {
+            await bot.telegram.sendMessage(chatId, alert.message, {
+              parse_mode: 'Markdown',
+            });
+            await wait(1000);
+          } catch (err) {
+            console.log('An error occurred when sending alerts', err);
+            // Handle the error (retry, notify user, etc.)
+          }
+        }
         await db.insertAlert(alert);
-        await wait(1000);
       }
     } catch (err) {
       console.log('An error occurred when sending alerts', err);
@@ -167,16 +193,16 @@ const alertScheduler = new CronJob('0 */1 * * * *', async () => {
   }
 });
 
-bot.telegram.setMyCommands([
-  {
-    command: 'walletmanager',
-    description: 'Get the status of the wallet manager',
-  },
-  {
-    command: 'subscribe',
-    description: 'Subscribe to notifications',
-  },
-]);
+// bot.telegram.setMyCommands([
+//   {
+//     command: 'walletmanager',
+//     description: 'Get the status of the wallet manager',
+//   },
+//   {
+//     command: 'subscribe',
+//     description: 'Subscribe to notifications',
+//   },
+// ]);
 
 bot.launch();
 dailyReportScheduler.start();

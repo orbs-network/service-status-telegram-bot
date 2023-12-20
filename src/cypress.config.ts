@@ -1,6 +1,9 @@
 import { defineConfig } from 'cypress';
 import axios, { AxiosError } from 'axios';
 import { getBorderCharacters, table } from 'table';
+import { bot, db } from '.';
+import { NotificationType } from './types';
+import { wait } from './utils';
 
 type TestResults = {
   totalTests: number;
@@ -62,20 +65,19 @@ async function postResults(results: TestResults) {
     }\nTotal paused: ${results.totalPending}`;
     console.log(message);
 
-    await axios.post(
-      `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
-      JSON.stringify({
-        chat_id: process.env.CHAT_ID,
-        parse_mode: 'MarkdownV2',
-        text: message,
-      }),
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
+    const notifications = await db.getByNotificationType(NotificationType.TWAP);
+    for (const { chatId } of notifications) {
+      try {
+        await bot.telegram.sendMessage(chatId, message, {
+          parse_mode: 'Markdown',
+        });
+        await wait(1000);
+      } catch (err) {
+        console.log('An error occurred when sending TWAP e2e results', err);
+        // Handle the error (retry, notify user, etc.)
       }
-    );
+    }
+
     console.log('Results posted to Telegram successfully ✅');
   } catch (err) {
     console.error('Error posting results to Telegram:', (err as AxiosError).message, err);
@@ -84,6 +86,7 @@ async function postResults(results: TestResults) {
 
 export default defineConfig({
   e2e: {
+    specPattern: 'src/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     setupNodeEvents(on, config) {
       on('after:run', async (results) => {
         if ('totalTests' in results) {

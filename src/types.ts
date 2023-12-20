@@ -15,7 +15,6 @@ export type Notification = {
 };
 
 export type Alert = {
-  chatId: number;
   notificationType: NotificationType;
   alertType: string;
   message: string;

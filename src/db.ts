@@ -1,5 +1,5 @@
-import sqlite3 from 'sqlite3';
-import { Alert, AlertDb, Notification } from './types';
+import * as sqlite3 from 'sqlite3';
+import { Alert, AlertDb, Notification, NotificationType } from './types';
 
 export class Database {
   private db;
@@ -89,6 +89,23 @@ export class Database {
     });
   }
 
+  getByNotificationType(notificationType: NotificationType): Promise<Notification[]> {
+    return new Promise<Notification[]>((resolve, reject) => {
+      this.db.all(
+        'SELECT * FROM notifications WHERE notificationType = ?',
+        [notificationType],
+        (err, rows: Notification[]) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          resolve(rows);
+        }
+      );
+    });
+  }
+
   get(id: string): Promise<Notification> {
     return new Promise<Notification>((resolve, reject) => {
       this.db.get('SELECT * FROM notifications WHERE id = ?', [id], (err, row: Notification) => {
@@ -141,8 +158,8 @@ export class Database {
     });
   }
 
-  getAlertId({ chatId, notificationType, alertType, name }: Alert): string {
-    return `${notificationType}:${alertType}:${chatId}:${name}`;
+  getAlertId({ notificationType, alertType, name }: Alert): string {
+    return `${notificationType}:${alertType}:${name}`;
   }
 
   async getAlert(alert: Alert): Promise<AlertDb> {

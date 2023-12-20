@@ -1,8 +1,8 @@
 import { Context, Markup } from 'telegraf';
-import { Chat } from 'telegraf/types';
-import WalletManager from './wallet-manager/WalletManager';
+import { WalletManager } from './wallet-manager';
 import { config } from './config';
 import { NotificationType } from './types';
+import { execSync } from 'child_process';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -15,11 +15,14 @@ export async function getDailyReport(notificationType: NotificationType) {
       return output;
     }
     case NotificationType.TWAP:
-      return `TWAP report is not setup`;
+      execSync('npm run test:twap:e2e');
+      return null;
+    default:
+      return null;
   }
 }
 
-export async function getAlerts(notificationType: NotificationType, chatId: number) {
+export async function getAlerts(notificationType: NotificationType) {
   switch (notificationType) {
     case NotificationType.WalletManager: {
       if (!config.WalletManagerEndpoint) {
@@ -29,7 +32,6 @@ export async function getAlerts(notificationType: NotificationType, chatId: numb
 
       return await WalletManager.alerts({
         walletManagerEndpoint: config.WalletManagerEndpoint,
-        chatId,
       });
     }
     case NotificationType.TWAP:
