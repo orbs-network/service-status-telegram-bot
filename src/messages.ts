@@ -15,7 +15,6 @@ export async function getDailyReport(notificationType: NotificationType) {
       return output;
     }
     case NotificationType.TWAP:
-      await Twap.e2e();
       return null;
     default:
       return null;

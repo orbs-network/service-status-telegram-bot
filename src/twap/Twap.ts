@@ -1,11 +1,13 @@
 import { execSync } from 'child_process';
 
 export class Twap {
-  static async e2e() {
+  static async report() {
+    let output = '';
     try {
-      execSync('npm run test:twap:e2e');
+      output = 'TWAP report is not setup yet';
     } catch (err) {
-      console.error('Error running TWAPE2E', err);
+      console.error('Error running TWAP report', err);
     }
+    return output;
   }
 }

@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/index.ts",
-    "build": "tsc",
-    "test:twap:e2e": "cypress run --config-file src/cypress.config.ts"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +13,6 @@
   "dependencies": {
     "axios": "^1.6.2",
     "cron": "^3.1.6",
-    "cypress": "^13.6.1",
     "date-fns": "^3.0.0",
     "dotenv": "^16.3.1",
     "nodemon": "^3.0.2",

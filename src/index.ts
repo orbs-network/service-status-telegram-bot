@@ -49,7 +49,10 @@ bot.command('walletmanager', async (ctx) => {
 });
 
 bot.command('twap', async (ctx) => {
-  await Twap.e2e();
+  const output = await Twap.report();
+  ctx.reply(output, {
+    parse_mode: 'Markdown',
+  });
 });
 
 bot.on('my_chat_member', async (ctx) => {
@@ -200,13 +203,10 @@ const alertScheduler = new CronJob('0 */1 * * * *', async () => {
 
 // bot.telegram.setMyCommands([
 //   {
-//     command: 'walletmanager',
-//     description: 'Get the status of the wallet manager',
+//     command: 'admin',
+//     description: 'Manage alerts and status updates',
 //   },
-//   {
-//     command: 'subscribe',
-//     description: 'Subscribe to notifications',
-//   },
+
 // ]);
 
 bot.launch();
