@@ -8,6 +8,7 @@ import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
 import { Alert, NotificationType, NotificationTypeNames } from './types';
 import { differenceInHours } from 'date-fns';
+import { Twap } from './twap';
 
 if (!config.BotToken) {
   throw new Error('Bot token missing!');
@@ -45,6 +46,10 @@ bot.command('walletmanager', async (ctx) => {
   ctx.reply(output, {
     parse_mode: 'Markdown',
   });
+});
+
+bot.command('twap', async (ctx) => {
+  await Twap.e2e();
 });
 
 bot.on('my_chat_member', async (ctx) => {

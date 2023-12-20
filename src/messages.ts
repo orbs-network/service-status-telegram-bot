@@ -2,7 +2,7 @@ import { Context, Markup } from 'telegraf';
 import { WalletManager } from './wallet-manager';
 import { config } from './config';
 import { NotificationType } from './types';
-import { execSync } from 'child_process';
+import { Twap } from './twap';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -15,7 +15,7 @@ export async function getDailyReport(notificationType: NotificationType) {
       return output;
     }
     case NotificationType.TWAP:
-      execSync('npm run test:twap:e2e');
+      await Twap.e2e();
       return null;
     default:
       return null;
