@@ -89,6 +89,20 @@ bot.command('subscribe', async (ctx) => {
   await subscribe(ctx, db, ctx.from.id);
 });
 
+bot.action('subscribe', async (ctx) => {
+  if (!ctx.callbackQuery) {
+    return;
+  }
+
+  const chatId = ctx.callbackQuery.message?.chat.id;
+
+  if (!chatId) {
+    return;
+  }
+
+  await subscribe(ctx, db, chatId);
+});
+
 bot.action(/^subscribe:/g, async (ctx) => {
   try {
     if (!ctx.callbackQuery) {
