@@ -25,7 +25,7 @@ export async function getDailyReport(notificationType: NotificationType) {
 
 export async function getAlerts(notificationType: NotificationType) {
   switch (notificationType) {
-    case NotificationType.WalletManager: {
+    case NotificationType.WalletManagerAlerts: {
       if (!config.WalletManagerEndpoint) {
         console.error('Wallet manager endpoint is not configured');
         return [];
@@ -35,7 +35,7 @@ export async function getAlerts(notificationType: NotificationType) {
         walletManagerEndpoint: config.WalletManagerEndpoint,
       });
     }
-    case NotificationType.TWAP:
+    default:
       return [];
   }
 }

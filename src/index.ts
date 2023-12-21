@@ -6,7 +6,7 @@ import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
-import { Alert, NotificationType, NotificationTypeNames } from './types';
+import { NotificationType, NotificationTypeNames } from './types';
 import { differenceInHours } from 'date-fns';
 import { Twap } from './twap';
 

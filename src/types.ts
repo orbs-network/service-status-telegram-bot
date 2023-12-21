@@ -1,11 +1,13 @@
 export enum NotificationType {
   WalletManager = 'WalletManager',
   TWAP = 'TWAP',
+  WalletManagerAlerts = 'WalletManagerAlerts',
 }
 
 export const NotificationTypeNames = {
   [NotificationType.WalletManager]: 'Wallet Manager',
   [NotificationType.TWAP]: 'TWAP',
+  [NotificationType.WalletManagerAlerts]: 'Wallet Manager Alerts',
 };
 
 export type Notification = {
