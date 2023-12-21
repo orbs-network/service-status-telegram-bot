@@ -1,4 +1,4 @@
-import { Telegraf, Context } from 'telegraf';
+import { Telegraf, Context, Markup } from 'telegraf';
 import { CallbackQuery, Update } from 'telegraf/types';
 import { config } from './config';
 import { WalletManager } from './wallet-manager';
@@ -109,7 +109,6 @@ bot.action(/^subscribe:/g, async (ctx) => {
     ctx.answerCbQuery(`You have subscribed to ${NotificationTypeNames[notificationType]}.`, {
       show_alert: true,
     });
-    ctx.deleteMessage();
   } catch (err) {
     let message = 'An error occured when subscribing';
 
@@ -120,6 +119,46 @@ bot.action(/^subscribe:/g, async (ctx) => {
     }
 
     ctx.answerCbQuery(message, { show_alert: true });
+  }
+  ctx.deleteMessage();
+});
+
+bot.command('admin', async (ctx) => {
+  const { chat } = ctx.message;
+  if (chat.type === 'private') {
+    return;
+  }
+
+  try {
+    const admins = await ctx.getChatAdministrators();
+    const isAdmin = admins.some((admin) => admin.user.id === ctx.from.id);
+
+    if (!isAdmin) {
+      return;
+    }
+
+    const subscriptions = await db.getByChatId(ctx.chat.id);
+
+    const buttons = subscriptions.map((item) => [
+      Markup.button.callback(
+        NotificationTypeNames[item.notificationType],
+        `report:${item.notificationType}`
+      ),
+      Markup.button.callback('🗑️', `rm:${item.notificationType}`),
+    ]);
+
+    buttons.push([Markup.button.callback('🪄 Subscribe', 'subscribe')]);
+    buttons.push([Markup.button.callback('❌ Close', 'close')]);
+
+    await ctx.reply(
+      `Manage the *Orbs Service Status* subscriptions for this group.\n\n- Add/remove subscriptions\n- View a report of your subscriptions`,
+      {
+        reply_markup: Markup.inlineKeyboard(buttons).reply_markup,
+        parse_mode: 'Markdown',
+      }
+    );
+  } catch (err) {
+    console.log('An unknown error occured.', err);
   }
 });
 

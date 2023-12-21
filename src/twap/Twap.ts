@@ -1,5 +1,3 @@
-import { execSync } from 'child_process';
-
 export class Twap {
   static async report() {
     let output = '';
