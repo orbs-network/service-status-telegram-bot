@@ -14,6 +14,12 @@ export type L3Status = {
   };
 };
 
+export type BackupTaker = {
+  nodeAddress: string;
+  Status: string;
+  Timestamp: string;
+};
+
 export type TakerStatus = {
   name: string;
   status: string;
