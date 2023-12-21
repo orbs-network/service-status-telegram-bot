@@ -1,5 +1,6 @@
 import { getBorderCharacters, table } from 'table';
 import { L3Status, TakerStatus } from './types';
+import { truncate } from '../utils';
 
 export class Twap {
   static async load() {
@@ -17,6 +18,11 @@ export class Twap {
         }
 
         const takerStatus = twapL3Status.VMStatusJson;
+
+        if (!takerStatus) {
+          continue;
+        }
+
         takers.push({
           name: committeeNode.Name,
           status: takerStatus.Status.substring(9, takerStatus.Status.indexOf(',')).trim(),
@@ -32,13 +38,12 @@ export class Twap {
   }
 
   static async report() {
-    let output = '';
+    let output = '📊 TWAP Takers\n\n';
     try {
       const takers = await Twap.load();
       const tableOutput = takers.map((taker) => [
-        taker.name,
+        truncate(taker.name, 20),
         taker.status === 'OK' ? '✅' : taker.status,
-        new Date(taker.timestamp).toLocaleString(),
       ]);
       output += `\`\`\`${table(tableOutput, {
         border: getBorderCharacters('void'),
