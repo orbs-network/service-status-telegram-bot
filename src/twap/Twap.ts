@@ -19,7 +19,7 @@ export class Twap {
         const takerStatus = twapL3Status.VMStatusJson;
         takers.push({
           name: committeeNode.Name,
-          status: takerStatus.Status,
+          status: takerStatus.Status.substring(9, takerStatus.Status.indexOf(',')).trim(),
           timestamp: Date.parse(takerStatus.Timestamp),
         });
       }
@@ -37,7 +37,7 @@ export class Twap {
       const takers = await Twap.load();
       const tableOutput = takers.map((taker) => [
         taker.name,
-        taker.status,
+        taker.status === 'OK' ? '✅' : taker.status,
         new Date(taker.timestamp).toLocaleString(),
       ]);
       output += `\`\`\`${table(tableOutput, {
