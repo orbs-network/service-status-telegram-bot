@@ -57,7 +57,7 @@ export async function subscribe(ctx: Context, db: Database, fromId: number) {
       const subscriptions = await db.getByChatId(ctx.chat.id);
 
       const buttons = Object.values(NotificationType)
-        .filter((n) => subscriptions.some((s) => s.notificationType === n))
+        .filter((n) => !subscriptions.some((s) => s.notificationType === n))
         .map((notificationType) =>
           Markup.button.callback(
             NotificationTypeNames[notificationType],
