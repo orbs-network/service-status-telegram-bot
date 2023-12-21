@@ -27,10 +27,20 @@ export class Database {
     this.db.run(createAlertsTable);
   }
 
+  getId({
+    chatId,
+    notificationType,
+  }: {
+    chatId: number;
+    notificationType: NotificationType;
+  }): string {
+    return `${chatId}:${notificationType}`;
+  }
+
   async insert(newNotification: Omit<Notification, 'id'>): Promise<boolean> {
     const { chatId, notificationType } = newNotification;
 
-    const id = `${chatId}:${notificationType}`;
+    const id = this.getId({ chatId, notificationType });
 
     // Check if notification already exists
     try {

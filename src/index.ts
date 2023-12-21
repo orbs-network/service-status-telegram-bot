@@ -78,7 +78,7 @@ bot.on('my_chat_member', async (ctx) => {
   }
 
   // send admin message to subscribe to notifications
-  await subscribe(ctx, ctx.update.my_chat_member.from.id);
+  await subscribe(ctx, db, ctx.update.my_chat_member.from.id);
 });
 
 bot.command('subscribe', async (ctx) => {
@@ -86,7 +86,7 @@ bot.command('subscribe', async (ctx) => {
     return;
   }
 
-  await subscribe(ctx, ctx.from.id);
+  await subscribe(ctx, db, ctx.from.id);
 });
 
 bot.action(/^subscribe:/g, async (ctx) => {
@@ -159,6 +159,39 @@ bot.command('admin', async (ctx) => {
     );
   } catch (err) {
     console.log('An unknown error occured.', err);
+  }
+});
+
+bot.action('close', async (ctx) => {
+  ctx.deleteMessage();
+});
+
+bot.action(/^rm:/g, async (ctx) => {
+  // Handle button action for removing DAO subscriptions
+  try {
+    if (!ctx.callbackQuery) {
+      throw new Error();
+    }
+
+    const chatId = ctx.callbackQuery.message?.chat.id;
+
+    if (!chatId) {
+      throw new Error('No chat Id');
+    }
+
+    const notificationType = (ctx.callbackQuery as CallbackQuery.DataQuery).data.split(
+      ':'
+    )[1] as NotificationType;
+    const id = db.getId({ chatId, notificationType });
+
+    await db.delete(id);
+
+    ctx.answerCbQuery(`You have unsubscribed from ${NotificationTypeNames[notificationType]}`, {
+      show_alert: true,
+    });
+    ctx.deleteMessage();
+  } catch (err) {
+    ctx.answerCbQuery(`An unknown error occured.`, { show_alert: true });
   }
 });
 
@@ -240,13 +273,12 @@ const alertScheduler = new CronJob('0 */1 * * * *', async () => {
   }
 });
 
-// bot.telegram.setMyCommands([
-//   {
-//     command: 'admin',
-//     description: 'Manage alerts and status updates',
-//   },
-
-// ]);
+bot.telegram.setMyCommands([
+  {
+    command: 'admin',
+    description: 'Manage alerts and status updates',
+  },
+]);
 
 bot.launch();
 dailyReportScheduler.start();
