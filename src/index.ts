@@ -94,13 +94,13 @@ bot.action('subscribe', async (ctx) => {
     return;
   }
 
-  const chatId = ctx.callbackQuery.message?.chat.id;
+  const fromId = ctx.from?.id;
 
-  if (!chatId) {
+  if (!fromId) {
     return;
   }
 
-  await subscribe(ctx, db, chatId);
+  await subscribe(ctx, db, fromId);
 });
 
 bot.action(/^subscribe:/g, async (ctx) => {
