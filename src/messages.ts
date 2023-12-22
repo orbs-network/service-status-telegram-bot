@@ -4,6 +4,7 @@ import { config } from './config';
 import { NotificationType, NotificationTypeNames } from './types';
 import { Twap } from './twap';
 import { Database } from './db';
+import { LiquidityHub } from './liquidity-hub';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -12,12 +13,12 @@ export async function getDailyReport(notificationType: NotificationType) {
         return 'Wallet manager endpoint is not configured';
       }
 
-      const output = await WalletManager.report(config.WalletManagerEndpoint);
-      return output;
+      return await WalletManager.report(config.WalletManagerEndpoint);
     }
     case NotificationType.TWAP:
-      const output = await Twap.report();
-      return output;
+      return await Twap.report();
+    case NotificationType.LiquidityHub:
+      return await LiquidityHub.report();
     default:
       return null;
   }

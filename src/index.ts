@@ -180,8 +180,38 @@ bot.action('close', async (ctx) => {
   ctx.deleteMessage();
 });
 
+bot.action(/^report:/g, async (ctx) => {
+  try {
+    if (!ctx.callbackQuery) {
+      throw new Error();
+    }
+
+    const chatId = ctx.callbackQuery.message?.chat.id;
+
+    if (!chatId) {
+      throw new Error('No chat Id');
+    }
+
+    const notificationType = (ctx.callbackQuery as CallbackQuery.DataQuery).data.split(
+      ':'
+    )[1] as NotificationType;
+
+    const report = await getDailyReport(notificationType);
+
+    if (!report) {
+      return;
+    }
+
+    ctx.reply(report, {
+      parse_mode: 'Markdown',
+    });
+    ctx.deleteMessage();
+  } catch (err) {
+    ctx.answerCbQuery(`An unknown error occured.`, { show_alert: true });
+  }
+});
+
 bot.action(/^rm:/g, async (ctx) => {
-  // Handle button action for removing DAO subscriptions
   try {
     if (!ctx.callbackQuery) {
       throw new Error();
