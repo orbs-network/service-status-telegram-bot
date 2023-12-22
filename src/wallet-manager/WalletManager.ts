@@ -18,14 +18,18 @@ export class WalletManager {
         throw new Error('No data. Something wrong with /health endpoint');
       }
 
-      const tableOutput = Object.entries(result.data.networks).map(([name, network]) => [
-        `${name.toUpperCase()}`,
-        network.status === 'OK' ? '✅' : network.status,
-      ]);
+      const tableOutput = [
+        ['', 'Status', 'Available Wallets', 'Unusable Wallets', 'Errors'],
+        ...Object.entries(result.data.networks).map(([name, network]) => [
+          name,
+          network.status,
+          network.wallets.availableWallets.length,
+          network.wallets.unusableWallets.length,
+          network.errorCount,
+        ]),
+      ];
 
-      output += `\`\`\`${table(tableOutput, {
-        border: getBorderCharacters('void'),
-      })}\`\`\``;
+      output += `\`\`\`${table(tableOutput)}\`\`\``;
     } catch (error) {
       console.error(error);
 
