@@ -49,12 +49,8 @@ export class LiquidityHub {
     try {
       const takers = await LiquidityHub.loadBackupTakers();
       const tableOutput = [
-        ['', '*Status*', '*Bids*'],
-        ...takers.map((taker) => [
-          truncate(taker.name, 20),
-          taker.status === 'OK' ? '✅' : taker.status,
-          taker.bids,
-        ]),
+        ['', 'Status', 'Bids'],
+        ...takers.map((taker) => [truncate(taker.name, 20), taker.status, taker.bids]),
       ];
       output += `\`\`\`${table(tableOutput)}\`\`\``;
     } catch (err) {
