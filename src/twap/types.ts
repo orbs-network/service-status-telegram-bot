@@ -18,10 +18,16 @@ export type BackupTaker = {
   nodeAddress: string;
   Status: string;
   Timestamp: string;
+  total: {
+    bids: number;
+    fills: number;
+  };
 };
 
 export type TakerStatus = {
   name: string;
   status: string;
   timestamp: number;
+  bids: number;
+  fills: number;
 };

@@ -27,6 +27,8 @@ export class Twap {
           name: resp.nodeAddress,
           status: resp.Status.substring(9, resp.Status.indexOf(',')).trim(),
           timestamp: Date.parse(resp.Timestamp),
+          bids: resp.total.bids,
+          fills: resp.total.fills,
         });
       }
     } catch (err) {
@@ -35,49 +37,47 @@ export class Twap {
     return takers;
   }
 
-  static async loadTakers() {
-    const takers: TakerStatus[] = [];
-    try {
-      const result = await fetch('https://status.orbs.network/json-full');
+  // static async loadTakers() {
+  //   const takers: TakerStatus[] = [];
+  //   try {
+  //     const result = await fetch('https://status.orbs.network/json-full');
 
-      const l3status = (await result.json()) as L3Status;
+  //     const l3status = (await result.json()) as L3Status;
 
-      for (const committeeNode of Object.values(l3status.CommitteeNodes)) {
-        const twapL3Status = committeeNode.NodeServices['vm-twap'];
+  //     for (const committeeNode of Object.values(l3status.CommitteeNodes)) {
+  //       const twapL3Status = committeeNode.NodeServices['vm-twap'];
 
-        if (!twapL3Status) {
-          continue;
-        }
+  //       if (!twapL3Status) {
+  //         continue;
+  //       }
 
-        const takerStatus = twapL3Status.VMStatusJson;
+  //       const takerStatus = twapL3Status.VMStatusJson;
 
-        if (!takerStatus) {
-          continue;
-        }
+  //       if (!takerStatus) {
+  //         continue;
+  //       }
 
-        takers.push({
-          name: committeeNode.Name,
-          status: takerStatus.Status.substring(9, takerStatus.Status.indexOf(',')).trim(),
-          timestamp: Date.parse(takerStatus.Timestamp),
-        });
-      }
-    } catch (err) {
-      console.error('Error loading TWAP takers', err);
-    }
-    return takers;
-  }
+  //       takers.push({
+  //         name: committeeNode.Name,
+  //         status: takerStatus.Status.substring(9, takerStatus.Status.indexOf(',')).trim(),
+  //         timestamp: Date.parse(takerStatus.Timestamp),
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error('Error loading TWAP takers', err);
+  //   }
+  //   return takers;
+  // }
 
   static async report() {
     let output = '📊 *TWAP Takers*\n\n';
     try {
       const takers = await Twap.loadBackupTakers();
-      const tableOutput = takers.map((taker) => [
-        truncate(taker.name, 20),
-        taker.status === 'OK' ? '✅' : taker.status,
-      ]);
-      output += `\`\`\`${table(tableOutput, {
-        border: getBorderCharacters('void'),
-      })}\`\`\``;
+      const tableOutput = [
+        ['', 'Status', 'Bids', 'Fills'],
+        ...takers.map((taker) => [truncate(taker.name, 20), taker.status, taker.bids, taker.fills]),
+      ];
+      output += `\`\`\`${table(tableOutput)}\`\`\``;
     } catch (err) {
       console.error('Error running TWAP report', err);
       output += 'Error running TWAP report';
