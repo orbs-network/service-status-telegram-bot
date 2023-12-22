@@ -22,7 +22,7 @@ export class WalletManager {
       const unusableWallets = Object.entries(result.data.networks).length;
 
       const tableOutput = [
-        ['', 'Status', 'Available', 'Unusable', 'Errors'],
+        ['', 'Status', 'A. W.', 'U. W.', 'Err'],
         ...Object.entries(result.data.networks).map(([name, network]) => [
           name,
           network.status,
