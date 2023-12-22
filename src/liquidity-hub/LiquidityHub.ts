@@ -22,15 +22,20 @@ export class LiquidityHub {
         if (result.status === 'rejected') {
           continue;
         }
-        const resp = (await result.value.json()) as { nodeAddress: string; Status: string };
-        console.log(resp);
+        const resp = (await result.value.json()) as {
+          nodeAddress: string;
+          Status: string;
+          total: { bids: number };
+        };
 
         if (!resp.Status) {
           continue;
         }
+
         takers.push({
           name: resp.nodeAddress,
           status: resp.Status.substring(9, resp.Status.indexOf(',')).trim(),
+          bids: resp.total.bids,
         });
       }
     } catch (err) {
@@ -43,13 +48,15 @@ export class LiquidityHub {
     let output = '📊 *LH Takers*\n\n';
     try {
       const takers = await LiquidityHub.loadBackupTakers();
-      const tableOutput = takers.map((taker) => [
-        truncate(taker.name, 20),
-        taker.status === 'OK' ? '✅' : taker.status,
-      ]);
-      output += `\`\`\`${table(tableOutput, {
-        border: getBorderCharacters('void'),
-      })}\`\`\``;
+      const tableOutput = [
+        ['', '*Status*', '*Bids*'],
+        ...takers.map((taker) => [
+          truncate(taker.name, 20),
+          taker.status === 'OK' ? '✅' : taker.status,
+          taker.bids,
+        ]),
+      ];
+      output += `\`\`\`${table(tableOutput)}\`\`\``;
     } catch (err) {
       console.error('Error running LH report', err);
       output += 'Error running LH report';
