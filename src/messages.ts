@@ -5,6 +5,7 @@ import { NotificationType, NotificationTypeNames } from './types';
 import { Twap } from './twap';
 import { Database } from './db';
 import { LiquidityHub } from './liquidity-hub';
+import { DefiNotifications } from './defi-notifications';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -19,6 +20,8 @@ export async function getDailyReport(notificationType: NotificationType) {
       return await Twap.report();
     case NotificationType.LiquidityHub:
       return await LiquidityHub.report();
+    case NotificationType.DefiNotifications:
+      return await DefiNotifications.report();
     default:
       return null;
   }

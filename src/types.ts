@@ -3,6 +3,7 @@ export enum NotificationType {
   TWAP = 'TWAP',
   WalletManagerAlerts = 'WalletManagerAlerts',
   LiquidityHub = 'LiquidityHub',
+  DefiNotifications = 'DefiNotifications',
 }
 
 export const NotificationTypeNames = {
@@ -10,6 +11,7 @@ export const NotificationTypeNames = {
   [NotificationType.TWAP]: 'TWAP',
   [NotificationType.WalletManagerAlerts]: 'Wallet Manager Alerts',
   [NotificationType.LiquidityHub]: 'Liquidity Hub',
+  [NotificationType.DefiNotifications]: 'DeFi Notifications',
 };
 
 export type Notification = {
