@@ -9,6 +9,8 @@ import { getAlerts, getDailyReport, subscribe } from './messages';
 import { NotificationType, NotificationTypeNames } from './types';
 import { differenceInHours } from 'date-fns';
 import { Twap } from './twap';
+import { LiquidityHub } from './liquidity-hub';
+import { DefiNotifications } from './defi-notifications';
 
 if (!config.BotToken) {
   throw new Error('Bot token missing!');
@@ -64,6 +66,20 @@ bot.command('walletmanager', async (ctx) => {
 
 bot.command('twap', async (ctx) => {
   const output = await Twap.report();
+  ctx.reply(output, {
+    parse_mode: 'Markdown',
+  });
+});
+
+bot.command('lh', async (ctx) => {
+  const output = await LiquidityHub.report();
+  ctx.reply(output, {
+    parse_mode: 'Markdown',
+  });
+});
+
+bot.command('defi', async (ctx) => {
+  const output = await DefiNotifications.report();
   ctx.reply(output, {
     parse_mode: 'Markdown',
   });

@@ -2,6 +2,7 @@ import { table, getBorderCharacters } from 'table';
 import { truncate } from '../utils';
 import { NotificationType, NotificationTypeNames } from '../types';
 import { DefiNotificationsStatus } from './types';
+import { config } from '../config';
 
 export class DefiNotifications {
   static async loadStatuses() {
@@ -46,9 +47,7 @@ export class DefiNotifications {
         truncate(status.name, 20),
         status.status === 'OK' ? '✅' : status.status,
       ]);
-      output += `\`\`\`${table(tableOutput, {
-        border: getBorderCharacters('void'),
-      })}\`\`\``;
+      output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
     } catch (err) {
       console.error('Error running Defi report', err);
       output += 'Error running Defi report';

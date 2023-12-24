@@ -2,6 +2,7 @@ import axios from 'axios';
 import { WalletManagerAlert, WalletManagerResponse } from './types';
 import { getBorderCharacters, table } from 'table';
 import { Alert, NotificationType } from '../types';
+import { config } from '../config';
 
 type AlertsParams = {
   walletManagerEndpoint: string;
@@ -19,16 +20,22 @@ export class WalletManager {
       }
 
       const tableOutput = [
-        ['', '', 'A.', 'U.', 'E.'],
+        ['', 'A.', 'U.', 'E.', ''],
         ...Object.entries(result.data.networks).map(([name, network]) => {
           const availableWallets = Object.entries(network.wallets.availableWallets).length;
           const unusableWallets = Object.entries(network.wallets.unusableWallets).length;
 
-          return [name, network.status, availableWallets, unusableWallets, network.errorCount];
+          return [
+            name,
+            availableWallets,
+            unusableWallets,
+            network.errorCount,
+            network.status === 'OK' ? '✅' : network.status,
+          ];
         }),
       ];
 
-      output += `\`\`\`${table(tableOutput)}\`\`\``;
+      output += `\`\`\`\n${table(tableOutput, { ...config.AsciiTableOpts })}\n\`\`\``;
     } catch (error) {
       console.error(error);
 

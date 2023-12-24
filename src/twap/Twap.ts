@@ -1,6 +1,7 @@
 import { getBorderCharacters, table } from 'table';
 import { BackupTaker, L3Status, TakerStatus } from './types';
 import { truncate } from '../utils';
+import { config } from '../config';
 
 export class Twap {
   static async loadBackupTakers() {
@@ -74,10 +75,15 @@ export class Twap {
     try {
       const takers = await Twap.loadBackupTakers();
       const tableOutput = [
-        ['', 'Status', 'Bids', 'Fills'],
-        ...takers.map((taker) => [truncate(taker.name, 20), taker.status, taker.bids, taker.fills]),
+        ['', 'Bids', 'Fills', 'Status'],
+        ...takers.map((taker) => [
+          truncate(taker.name, 20),
+          taker.bids,
+          taker.fills,
+          taker.status === 'OK' ? '✅' : taker.status,
+        ]),
       ];
-      output += `\`\`\`${table(tableOutput)}\`\`\``;
+      output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
     } catch (err) {
       console.error('Error running TWAP report', err);
       output += 'Error running TWAP report';

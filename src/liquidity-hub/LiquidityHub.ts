@@ -1,6 +1,7 @@
 import { table, getBorderCharacters } from 'table';
 import { truncate } from '../utils';
 import { LiquidityHubTaker } from './types';
+import { config } from '../config';
 
 export class LiquidityHub {
   static async loadBackupTakers() {
@@ -49,10 +50,14 @@ export class LiquidityHub {
     try {
       const takers = await LiquidityHub.loadBackupTakers();
       const tableOutput = [
-        ['', 'Status', 'Bids'],
-        ...takers.map((taker) => [truncate(taker.name, 20), taker.status, taker.bids]),
+        ['', 'Bids', 'Status'],
+        ...takers.map((taker) => [
+          truncate(taker.name, 20),
+          taker.bids,
+          taker.status === 'OK' ? '✅' : taker.status,
+        ]),
       ];
-      output += `\`\`\`${table(tableOutput)}\`\`\``;
+      output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
     } catch (err) {
       console.error('Error running LH report', err);
       output += 'Error running LH report';
