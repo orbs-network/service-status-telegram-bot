@@ -37,7 +37,7 @@ bot.start(async (ctx) => {
   }
 });
 
-bot.command('bot-info', async (ctx) => {
+bot.command('info', async (ctx) => {
   const { chat } = ctx.message;
 
   if (chat.type === 'private') {
