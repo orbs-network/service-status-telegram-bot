@@ -40,15 +40,13 @@ bot.start(async (ctx) => {
 bot.command('info', async (ctx) => {
   const { chat } = ctx.message;
 
-  if (chat.type === 'private') {
-    ctx.reply(
-      `*Bot Info*\n\n- Bot name: ${bot.botInfo?.first_name}\n- Bot username: ${bot.botInfo?.username}\n- Bot id: ${bot.botInfo?.id}\n- Chat Id: ${chat.id}`,
-      {
-        parse_mode: 'Markdown',
-      }
-    );
-    return;
-  }
+  ctx.reply(
+    `*Bot Info*\n\n- Bot name: ${bot.botInfo?.first_name}\n- Bot username: ${bot.botInfo?.username}\n- Bot id: ${bot.botInfo?.id}\n- Chat Id: ${chat.id}`,
+    {
+      parse_mode: 'Markdown',
+    }
+  );
+  return;
 });
 
 bot.command('walletmanager', async (ctx) => {
