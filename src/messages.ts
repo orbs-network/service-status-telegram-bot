@@ -68,12 +68,12 @@ export async function subscribe(ctx: Context, db: Database, fromId: number) {
 
       const buttons = Object.values(NotificationType)
         .filter((n) => !subscriptions.some((s) => s.notificationType === n))
-        .map((notificationType) =>
+        .map((notificationType) => [
           Markup.button.callback(
             NotificationTypeNames[notificationType],
             `subscribe:${notificationType}`
-          )
-        );
+          ),
+        ]);
 
       await ctx.reply('Thanks for adding me to this group. Subscribe to the following:', {
         parse_mode: 'Markdown',
