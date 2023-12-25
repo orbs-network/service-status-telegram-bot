@@ -1,7 +1,7 @@
 import { table, getBorderCharacters } from 'table';
 import { truncate } from '../utils';
-import { NotificationType, NotificationTypeNames } from '../types';
-import { DefiNotificationsStatus } from './types';
+import { Alert, NotificationType, NotificationTypeNames } from '../types';
+import { DefiNotificationsAlert, DefiNotificationsStatus } from './types';
 import { config } from '../config';
 
 export class DefiNotifications {
@@ -53,5 +53,26 @@ export class DefiNotifications {
       output += 'Error running Defi report';
     }
     return output;
+  }
+
+  static async alerts() {
+    const alerts: Alert[] = [];
+    try {
+      const takers = await DefiNotifications.loadStatuses();
+      takers.forEach((status) => {
+        if (status.status !== 'OK') {
+          alerts.push({
+            notificationType: NotificationType.DefiNotificationsAlerts,
+            alertType: DefiNotificationsAlert.ServiceDown,
+            name: status.name,
+            timestamp: new Date().getTime(),
+            message: `🚨 *DeFi SERVICE DOWN* 🚨\n\n${status.name} is down!`,
+          });
+        }
+      });
+    } catch (err) {
+      console.error('Error running Defi alerts', err);
+    }
+    return alerts;
   }
 }

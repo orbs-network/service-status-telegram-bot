@@ -1,7 +1,8 @@
-import { getBorderCharacters, table } from 'table';
-import { BackupTaker, L3Status, TakerStatus } from './types';
+import { table } from 'table';
+import { BackupTaker, TwapAlert, TakerStatus } from './types';
 import { truncate } from '../utils';
 import { config } from '../config';
+import { Alert, NotificationType } from '../types';
 
 export class Twap {
   static async loadBackupTakers() {
@@ -89,5 +90,26 @@ export class Twap {
       output += 'Error running TWAP report';
     }
     return output;
+  }
+
+  static async alerts() {
+    const alerts: Alert[] = [];
+    try {
+      const takers = await Twap.loadBackupTakers();
+      takers.forEach((taker) => {
+        if (taker.status !== 'OK') {
+          alerts.push({
+            notificationType: NotificationType.TwapAlerts,
+            alertType: TwapAlert.TakerDown,
+            name: taker.name,
+            timestamp: taker.timestamp,
+            message: `🚨 *TWAP TAKER DOWN* 🚨\n\n${taker.name} is down!`,
+          });
+        }
+      });
+    } catch (err) {
+      console.error('Error running TWAP alerts', err);
+    }
+    return alerts;
   }
 }

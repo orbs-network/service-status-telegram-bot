@@ -31,3 +31,7 @@ export type TakerStatus = {
   bids: number;
   fills: number;
 };
+
+export enum TwapAlert {
+  TakerDown = 'TakerDown',
+}

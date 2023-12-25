@@ -16,7 +16,7 @@ export async function getDailyReport(notificationType: NotificationType) {
 
       return await WalletManager.report(config.WalletManagerEndpoint);
     }
-    case NotificationType.TWAP:
+    case NotificationType.Twap:
       return await Twap.report();
     case NotificationType.LiquidityHub:
       return await LiquidityHub.report();
@@ -39,6 +39,12 @@ export async function getAlerts(notificationType: NotificationType) {
         walletManagerEndpoint: config.WalletManagerEndpoint,
       });
     }
+    case NotificationType.TwapAlerts:
+      return await Twap.alerts();
+    case NotificationType.LiquidityHubAlerts:
+      return await LiquidityHub.alerts();
+    case NotificationType.DefiNotificationsAlerts:
+      return await DefiNotifications.alerts();
     default:
       return [];
   }

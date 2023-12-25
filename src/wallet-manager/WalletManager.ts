@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { WalletManagerAlert, WalletManagerResponse } from './types';
-import { getBorderCharacters, table } from 'table';
+import { table } from 'table';
 import { Alert, NotificationType } from '../types';
 import { config } from '../config';
 
@@ -65,11 +65,11 @@ export class WalletManager {
         const unusableWallets = Object.entries(network.wallets.unusableWallets).length;
         if (unusableWallets > 0) {
           alerts.push({
-            notificationType: NotificationType.WalletManager,
+            notificationType: NotificationType.WalletManagerAlerts,
             alertType: WalletManagerAlert.UnusableWallets,
             name,
             timestamp: result.data.timestamp,
-            message: `🚨 UNUSABLE WALLETS 🚨\n\n*${name.toUpperCase()}* has *${unusableWallets}* unusable wallet${
+            message: `🚨 *UNUSABLE WALLETS* 🚨\n\n*${name.toUpperCase()}* has *${unusableWallets}* unusable wallet${
               unusableWallets > 1 ? 's' : ''
             }!`,
           });
@@ -80,11 +80,11 @@ export class WalletManager {
         const percentageAvailable = Math.round((availableWallets / totalWallets) * 100);
         if (percentageAvailable <= 30) {
           alerts.push({
-            notificationType: NotificationType.WalletManager,
+            notificationType: NotificationType.WalletManagerAlerts,
             alertType: WalletManagerAlert.LowAvailableWallets,
             name,
             timestamp: result.data.timestamp,
-            message: `🚨 AVAILABLE WALLETS ARE LOW 🚨\n\n*${name.toUpperCase()}* has *${availableWallets}* of *${totalWallets}* wallets available!`,
+            message: `🚨 *AVAILABLE WALLETS ARE LOW* 🚨\n\n*${name.toUpperCase()}* has *${availableWallets}* of *${totalWallets}* wallets available!`,
           });
         }
 
@@ -93,11 +93,11 @@ export class WalletManager {
 
         if (treasuryBalance <= minTreasuryBalance) {
           alerts.push({
-            notificationType: NotificationType.WalletManager,
+            notificationType: NotificationType.WalletManagerAlerts,
             alertType: WalletManagerAlert.LowTresuryBalance,
             name,
             timestamp: result.data.timestamp,
-            message: `🚨 LOW TREASURY BALANCE 🚨\n\n*${name.toUpperCase()}* has *${treasuryBalance}* in treasury when minimum is *${minTreasuryBalance}*!`,
+            message: `🚨 *LOW TREASURY BALANCE* 🚨\n\n*${name.toUpperCase()}* has *${treasuryBalance}* in treasury when minimum is *${minTreasuryBalance}*!`,
           });
         }
       });

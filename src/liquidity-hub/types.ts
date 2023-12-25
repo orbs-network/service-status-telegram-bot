@@ -3,3 +3,7 @@ export type LiquidityHubTaker = {
   status: string;
   bids: number;
 };
+
+export enum LiquidityHubAlert {
+  TakerDown = 'TakerDown',
+}

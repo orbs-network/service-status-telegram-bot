@@ -1,7 +1,8 @@
 import { table, getBorderCharacters } from 'table';
 import { truncate } from '../utils';
-import { LiquidityHubTaker } from './types';
+import { LiquidityHubAlert, LiquidityHubTaker } from './types';
 import { config } from '../config';
+import { Alert, NotificationType } from '../types';
 
 export class LiquidityHub {
   static async loadBackupTakers() {
@@ -63,5 +64,26 @@ export class LiquidityHub {
       output += 'Error running LH report';
     }
     return output;
+  }
+
+  static async alerts() {
+    const alerts: Alert[] = [];
+    try {
+      const takers = await LiquidityHub.loadBackupTakers();
+      takers.forEach((taker) => {
+        if (taker.status !== 'OK') {
+          alerts.push({
+            notificationType: NotificationType.LiquidityHubAlerts,
+            alertType: LiquidityHubAlert.TakerDown,
+            name: taker.name,
+            timestamp: new Date().getTime(),
+            message: `🚨 *LH TAKER DOWN* 🚨\n\n${taker.name} is down!`,
+          });
+        }
+      });
+    } catch (err) {
+      console.error('Error running LH alerts', err);
+    }
+    return alerts;
   }
 }
