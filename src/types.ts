@@ -1,6 +1,6 @@
 export enum NotificationType {
   WalletManager = 'WalletManager',
-  Twap = 'Twap',
+  Twap = 'TWAP',
   WalletManagerAlerts = 'WalletManagerAlerts',
   LiquidityHub = 'LiquidityHub',
   DefiNotifications = 'DefiNotifications',
