@@ -84,4 +84,5 @@ export enum WalletManagerAlert {
   UnusableWallets = 'UNUSABLE_WALLETS',
   LowTresuryBalance = 'LOW_TRESURY_BALANCE',
   LowAvailableWallets = 'LOW_AVAILABLE_WALLETS',
+  NetworkDown = 'NETWORK_DOWN',
 }

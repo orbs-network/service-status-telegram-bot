@@ -5,5 +5,5 @@ export type LiquidityHubTaker = {
 };
 
 export enum LiquidityHubAlert {
-  TakerDown = 'TakerDown',
+  TakerDown = 'TAKER_DOWN',
 }

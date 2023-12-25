@@ -4,5 +4,5 @@ export type DefiNotificationsStatus = {
 };
 
 export enum DefiNotificationsAlert {
-  ServiceDown = 'ServiceDown',
+  ServiceDown = 'SERVICE_DOWN',
 }

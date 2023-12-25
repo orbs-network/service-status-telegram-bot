@@ -69,7 +69,7 @@ export class WalletManager {
             alertType: WalletManagerAlert.UnusableWallets,
             name,
             timestamp: result.data.timestamp,
-            message: `🚨 *UNUSABLE WALLETS* 🚨\n\n*${name.toUpperCase()}* has *${unusableWallets}* unusable wallet${
+            message: `🚨 *WALLET MANAGER UNUSABLE WALLETS* 🚨\n\n*${name.toUpperCase()}* has *${unusableWallets}* unusable wallet${
               unusableWallets > 1 ? 's' : ''
             }!`,
           });
@@ -84,7 +84,7 @@ export class WalletManager {
             alertType: WalletManagerAlert.LowAvailableWallets,
             name,
             timestamp: result.data.timestamp,
-            message: `🚨 *AVAILABLE WALLETS ARE LOW* 🚨\n\n*${name.toUpperCase()}* has *${availableWallets}* of *${totalWallets}* wallets available!`,
+            message: `🚨 *WALLET MANAGER AVAILABLE WALLETS ARE LOW* 🚨\n\n*${name.toUpperCase()}* has *${availableWallets}* of *${totalWallets}* wallets available!`,
           });
         }
 
@@ -97,7 +97,17 @@ export class WalletManager {
             alertType: WalletManagerAlert.LowTresuryBalance,
             name,
             timestamp: result.data.timestamp,
-            message: `🚨 *LOW TREASURY BALANCE* 🚨\n\n*${name.toUpperCase()}* has *${treasuryBalance}* in treasury when minimum is *${minTreasuryBalance}*!`,
+            message: `🚨 *WALLET MANAGER LOW TREASURY BALANCE* 🚨\n\n*${name.toUpperCase()}* has *${treasuryBalance}* in treasury when minimum is *${minTreasuryBalance}*!`,
+          });
+        }
+
+        if (network.status !== 'OK') {
+          alerts.push({
+            notificationType: NotificationType.WalletManagerAlerts,
+            alertType: WalletManagerAlert.NetworkDown,
+            name,
+            timestamp: result.data.timestamp,
+            message: `🚨 *WALLET MANAGER NETWORK DOWN* 🚨\n\n*${name.toUpperCase()}* is down!`,
           });
         }
       });

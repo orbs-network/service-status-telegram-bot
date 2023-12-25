@@ -33,5 +33,5 @@ export type TakerStatus = {
 };
 
 export enum TwapAlert {
-  TakerDown = 'TakerDown',
+  TakerDown = 'TAKER_DOWN',
 }
