@@ -166,11 +166,6 @@ bot.action(/^subscribe:/g, async (ctx) => {
 });
 
 bot.command('admin', async (ctx) => {
-  const { chat } = ctx.message;
-  if (chat.type === 'private') {
-    return;
-  }
-
   try {
     const admins = await ctx.getChatAdministrators();
     const isAdmin = admins.some((admin) => admin.user.id === ctx.from.id);
