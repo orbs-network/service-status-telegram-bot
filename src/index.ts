@@ -38,10 +38,8 @@ bot.start(async (ctx) => {
 });
 
 bot.command('info', async (ctx) => {
-  const { chat } = ctx.message;
-
   ctx.reply(
-    `*Bot Info*\n\n- Bot name: ${bot.botInfo?.first_name}\n- Bot username: ${bot.botInfo?.username}\n- Bot id: ${bot.botInfo?.id}\n- Chat Id: ${chat.id}`,
+    `*Bot Info*\n\n- Bot name: ${bot.botInfo?.first_name}\n- Bot username: ${bot.botInfo?.username}\n- Bot id: ${bot.botInfo?.id}\n- Chat Id: ${ctx.chat.id}`,
     {
       parse_mode: 'Markdown',
     }
