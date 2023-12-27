@@ -103,7 +103,7 @@ export class Twap {
             alertType: TwapAlert.TakerDown,
             name: taker.name,
             timestamp: taker.timestamp,
-            message: `🚨 *TWAP TAKER DOWN* 🚨\n\n${taker.name} is down!`,
+            message: `🚨 *TWAP TAKER STATUS* 🚨\n\n*${taker.name}*: ${taker.status}`,
           });
         }
       });

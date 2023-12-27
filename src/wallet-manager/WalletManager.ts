@@ -107,7 +107,9 @@ export class WalletManager {
             alertType: WalletManagerAlert.NetworkDown,
             name,
             timestamp: result.data.timestamp,
-            message: `🚨 *WALLET MANAGER NETWORK DOWN* 🚨\n\n*${name.toUpperCase()}* is down!`,
+            message: `🚨 *WALLET MANAGER NETWORK STATUS* 🚨\n\n*${name.toUpperCase()}*: ${
+              network.status
+            }`,
           });
         }
       });

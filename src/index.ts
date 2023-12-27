@@ -300,7 +300,7 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
   }
 });
 
-const alertScheduler = new CronJob('0 */1 * * * *', async () => {
+const alertScheduler = new CronJob('0 */10 * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running alertScheduler...');
 

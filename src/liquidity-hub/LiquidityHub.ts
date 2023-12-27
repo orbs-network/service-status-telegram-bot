@@ -77,7 +77,7 @@ export class LiquidityHub {
             alertType: LiquidityHubAlert.TakerDown,
             name: taker.name,
             timestamp: new Date().getTime(),
-            message: `🚨 *LH TAKER DOWN* 🚨\n\n${taker.name} is down!`,
+            message: `🚨 *LH TAKER STATUS* 🚨\n\n*${taker.name}*: ${taker.status}`,
           });
         }
       });

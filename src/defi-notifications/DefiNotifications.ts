@@ -66,7 +66,7 @@ export class DefiNotifications {
             alertType: DefiNotificationsAlert.ServiceDown,
             name: status.name,
             timestamp: new Date().getTime(),
-            message: `🚨 *DeFi SERVICE DOWN* 🚨\n\n${status.name} is down!`,
+            message: `🚨 *DeFi SERVICE STATUS* 🚨\n\n*${status.name}*: ${status.status}`,
           });
         }
       });
