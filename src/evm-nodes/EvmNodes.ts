@@ -35,7 +35,7 @@ export class EvmNodes {
         statuses.push(result.value);
       }
     } catch (err) {
-      console.error('Error loading LH takers', err);
+      console.error('Error loading EVM nodes', err);
     }
     return statuses;
   }

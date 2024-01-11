@@ -24,13 +24,25 @@ export class LiquidityHub {
         if (result.status === 'rejected') {
           continue;
         }
-        const resp = (await result.value.json()) as {
+
+        let resp: {
           nodeAddress: string;
-          Status: string;
+          Status?: string;
           total: { bids: number };
         };
 
-        if (!resp.Status) {
+        try {
+          resp = (await result.value.json()) as {
+            nodeAddress: string;
+            Status?: string;
+            total: { bids: number };
+          };
+        } catch (err) {
+          console.error('Error parsing LH json', err);
+          continue;
+        }
+
+        if (!resp || !resp.Status) {
           continue;
         }
 
