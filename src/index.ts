@@ -6,7 +6,7 @@ import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
-import { NotificationType, NotificationTypeNames } from './types';
+import { AlertTypes, NotificationType, NotificationTypeNames, StatusTypes } from './types';
 import { differenceInHours } from 'date-fns';
 import { Twap } from './twap';
 import { LiquidityHub } from './liquidity-hub';
@@ -49,12 +49,7 @@ bot.command('info', async (ctx) => {
 });
 
 bot.command('walletmanager', async (ctx) => {
-  if (!config.WalletManagerEndpoint) {
-    ctx.reply('Wallet manager endpoint is not configured');
-    return;
-  }
-
-  const output = await WalletManager.report(config.WalletManagerEndpoint);
+  const output = await WalletManager.report();
 
   ctx.reply(output, {
     parse_mode: 'Markdown',
@@ -180,17 +175,15 @@ bot.command('admin', async (ctx) => {
       return;
     }
 
-    const subscriptions = await db.getByChatId(ctx.chat.id);
+    const notificationTypes =
+      ctx.chat.id === parseInt(config.StatusGroupChatId || '0') ? StatusTypes : AlertTypes;
 
-    const buttons = subscriptions.map((item) => [
-      Markup.button.callback(
-        NotificationTypeNames[item.notificationType],
-        `report:${item.notificationType}`
-      ),
-      Markup.button.callback('🗑️', `rm:${item.notificationType}`),
+    const buttons = notificationTypes.map((item) => [
+      Markup.button.callback(NotificationTypeNames[item], `report:${item}`),
+      // Markup.button.callback('🗑️', `rm:${item.notificationType}`),
     ]);
 
-    buttons.push([Markup.button.callback('🪄 Subscribe', 'subscribe')]);
+    // buttons.push([Markup.button.callback('🪄 Subscribe', 'subscribe')]);
     buttons.push([Markup.button.callback('❌ Close', 'close')]);
 
     await ctx.reply(
@@ -272,29 +265,20 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running dailyReportScheduler...');
 
-  // TODO: get snapshot of data then send to all subscribers
-  const dataSnapshot: Record<NotificationType, string> = {} as Record<NotificationType, string>;
+  const chatId = config.StatusGroupChatId;
+
+  if (!chatId) {
+    return;
+  }
+
   const notificationTypes = Object.values(NotificationType);
   for (const notificationType of notificationTypes) {
     try {
-      const report = await getDailyReport(notificationType);
-      if (!report) {
-        continue;
-      }
-      dataSnapshot[notificationType] = report;
-    } catch (err) {
-      console.log('An error occurred when sending daily report', err);
-      // Handle the error (retry, notify user, etc.)
-    }
-  }
-
-  const notifications = await db.getAll();
-  for (const { chatId, notificationType } of notifications) {
-    try {
-      const message = dataSnapshot[notificationType];
+      const message = await getDailyReport(notificationType);
       if (!message) {
         continue;
       }
+
       await bot.telegram.sendMessage(chatId, message, {
         parse_mode: 'Markdown',
       });
@@ -309,6 +293,12 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
 const alertScheduler = new CronJob('0 */10 * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running alertScheduler...');
+
+  const chatId = config.AlertGroupChatId;
+
+  if (!chatId) {
+    return;
+  }
 
   const notificationTypes = Object.values(NotificationType);
   for (const notificationType of notificationTypes) {
@@ -325,19 +315,11 @@ const alertScheduler = new CronJob('0 */10 * * * *', async () => {
 
           await db.deleteAlert(existingAlert.id);
         }
-        const notifications = await db.getByNotificationType(notificationType);
-        for (const { chatId } of notifications) {
-          try {
-            await bot.telegram.sendMessage(chatId, alert.message, {
-              parse_mode: 'Markdown',
-            });
-            await wait(1000);
-          } catch (err) {
-            console.log('An error occurred when sending alerts', err);
-            // Handle the error (retry, notify user, etc.)
-          }
-        }
+        await bot.telegram.sendMessage(chatId, alert.message, {
+          parse_mode: 'Markdown',
+        });
         await db.insertAlert(alert);
+        await wait(1000);
       }
     } catch (err) {
       console.log('An error occurred when sending alerts', err);

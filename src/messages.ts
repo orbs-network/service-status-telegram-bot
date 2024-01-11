@@ -11,11 +11,7 @@ import { EvmNodes } from './evm-nodes';
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
     case NotificationType.WalletManager: {
-      if (!config.WalletManagerEndpoint) {
-        return 'Wallet manager endpoint is not configured';
-      }
-
-      return await WalletManager.report(config.WalletManagerEndpoint);
+      return await WalletManager.report();
     }
     case NotificationType.Twap:
       return await Twap.report();
@@ -33,14 +29,7 @@ export async function getDailyReport(notificationType: NotificationType) {
 export async function getAlerts(notificationType: NotificationType) {
   switch (notificationType) {
     case NotificationType.WalletManagerAlerts: {
-      if (!config.WalletManagerEndpoint) {
-        console.error('Wallet manager endpoint is not configured');
-        return [];
-      }
-
-      return await WalletManager.alerts({
-        walletManagerEndpoint: config.WalletManagerEndpoint,
-      });
+      return await WalletManager.alerts();
     }
     case NotificationType.TwapAlerts:
       return await Twap.alerts();

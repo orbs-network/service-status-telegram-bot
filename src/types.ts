@@ -24,6 +24,22 @@ export const NotificationTypeNames = {
   [NotificationType.EvmNodesAlerts]: 'EVM Nodes Alerts',
 };
 
+export const AlertTypes = [
+  NotificationType.WalletManagerAlerts,
+  NotificationType.TwapAlerts,
+  NotificationType.LiquidityHubAlerts,
+  NotificationType.DefiNotificationsAlerts,
+  NotificationType.EvmNodesAlerts,
+];
+
+export const StatusTypes = [
+  NotificationType.WalletManager,
+  NotificationType.Twap,
+  NotificationType.LiquidityHub,
+  NotificationType.DefiNotifications,
+  NotificationType.EvmNodesStatus,
+];
+
 export type Notification = {
   id: string;
   chatId: number;

@@ -4,7 +4,8 @@ dotenv.config();
 
 export const config = {
   BotToken: process.env.BOT_TOKEN,
-  WalletManagerEndpoint: process.env.WALLET_MANAGER_ENDPOINT,
+  StatusGroupChatId: process.env.STATUS_GROUP_CHAT_ID,
+  AlertGroupChatId: process.env.ALERT_GROUP_CHAT_ID,
   AsciiTableOpts: {
     border: {
       bodyLeft: '',

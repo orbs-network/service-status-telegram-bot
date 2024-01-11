@@ -4,16 +4,14 @@ import { table } from 'table';
 import { Alert, NotificationType } from '../types';
 import { config } from '../config';
 
-type AlertsParams = {
-  walletManagerEndpoint: string;
-};
+const WalletManagerEndpoint = 'https://wallet-manager-1-a1922d7bed1d.herokuapp.com/health';
 
 export class WalletManager {
-  static async report(walletManagerEndpoint: string) {
+  static async report() {
     let output = '📊 *WALLET MANAGER*\n\n';
 
     try {
-      const result = await axios.get<WalletManagerResponse>(walletManagerEndpoint);
+      const result = await axios.get<WalletManagerResponse>(WalletManagerEndpoint);
 
       if (!result.data.networks) {
         throw new Error('No data. Something wrong with /health endpoint');
@@ -52,10 +50,10 @@ export class WalletManager {
     return output;
   }
 
-  static async alerts({ walletManagerEndpoint }: AlertsParams) {
+  static async alerts() {
     const alerts: Alert[] = [];
     try {
-      const result = await axios.get<WalletManagerResponse>(walletManagerEndpoint);
+      const result = await axios.get<WalletManagerResponse>(WalletManagerEndpoint);
 
       if (!result.data.networks) {
         throw new Error('No data. Something wrong with /health endpoint');
