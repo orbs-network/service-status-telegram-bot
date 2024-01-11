@@ -11,6 +11,7 @@ import { differenceInHours } from 'date-fns';
 import { Twap } from './twap';
 import { LiquidityHub } from './liquidity-hub';
 import { DefiNotifications } from './defi-notifications';
+import { EvmNodes } from './evm-nodes';
 
 if (!config.BotToken) {
   throw new Error('Bot token missing!');
@@ -76,6 +77,13 @@ bot.command('lh', async (ctx) => {
 
 bot.command('defi', async (ctx) => {
   const output = await DefiNotifications.report();
+  ctx.reply(output, {
+    parse_mode: 'Markdown',
+  });
+});
+
+bot.command('evm', async (ctx) => {
+  const output = await EvmNodes.report();
   ctx.reply(output, {
     parse_mode: 'Markdown',
   });

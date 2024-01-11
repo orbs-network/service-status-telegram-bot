@@ -7,6 +7,7 @@ export enum NotificationType {
   TwapAlerts = 'TwapAlerts',
   LiquidityHubAlerts = 'LiquidityHubAlerts',
   DefiNotificationsAlerts = 'DefiNotificationsAlerts',
+  EvmNodesAlerts = 'EvmNodesAlerts',
 }
 
 export const NotificationTypeNames = {
@@ -18,6 +19,7 @@ export const NotificationTypeNames = {
   [NotificationType.TwapAlerts]: 'TWAP Alerts',
   [NotificationType.LiquidityHubAlerts]: 'Liquidity Hub Alerts',
   [NotificationType.DefiNotificationsAlerts]: 'DeFi Notifications Alerts',
+  [NotificationType.EvmNodesAlerts]: 'EVM Nodes Alerts',
 };
 
 export type Notification = {
