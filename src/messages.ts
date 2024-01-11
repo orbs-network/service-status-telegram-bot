@@ -6,6 +6,7 @@ import { Twap } from './twap';
 import { Database } from './db';
 import { LiquidityHub } from './liquidity-hub';
 import { DefiNotifications } from './defi-notifications';
+import { EvmNodes } from './evm-nodes';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -22,6 +23,8 @@ export async function getDailyReport(notificationType: NotificationType) {
       return await LiquidityHub.report();
     case NotificationType.DefiNotifications:
       return await DefiNotifications.report();
+    case NotificationType.EvmNodesStatus:
+      return await EvmNodes.report();
     default:
       return null;
   }
@@ -45,6 +48,8 @@ export async function getAlerts(notificationType: NotificationType) {
       return await LiquidityHub.alerts();
     case NotificationType.DefiNotificationsAlerts:
       return await DefiNotifications.alerts();
+    case NotificationType.EvmNodesAlerts:
+      return await EvmNodes.alerts();
     default:
       return [];
   }
