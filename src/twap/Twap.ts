@@ -20,7 +20,6 @@ export class Twap {
           continue;
         }
         const resp = (await result.value.json()) as BackupTaker;
-        console.log(resp);
 
         if (!resp.Status) {
           continue;
