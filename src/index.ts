@@ -6,7 +6,13 @@ import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
-import { AlertTypes, NotificationType, NotificationTypeNames, StatusTypes } from './types';
+import {
+  AlertTypes,
+  NotificationType,
+  NotificationTypeNames,
+  NotificationTypeUrls,
+  StatusTypes,
+} from './types';
 import { differenceInHours } from 'date-fns';
 import { Twap } from './twap';
 import { LiquidityHub } from './liquidity-hub';
@@ -279,8 +285,14 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
         continue;
       }
 
+      const button = Markup.button.url(
+        '📊 View Status Page',
+        NotificationTypeUrls[notificationType]
+      );
+
       await bot.telegram.sendMessage(chatId, message, {
         parse_mode: 'Markdown',
+        reply_markup: Markup.inlineKeyboard([button]).reply_markup,
       });
       await wait(1000);
     } catch (err) {

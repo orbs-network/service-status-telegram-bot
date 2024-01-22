@@ -13,15 +13,31 @@ export enum NotificationType {
 
 export const NotificationTypeNames = {
   [NotificationType.WalletManager]: 'Wallet Manager',
-  [NotificationType.Twap]: 'TWAP',
   [NotificationType.WalletManagerAlerts]: 'Wallet Manager Alerts',
-  [NotificationType.LiquidityHub]: 'Liquidity Hub',
-  [NotificationType.DefiNotifications]: 'DeFi Notifications',
+  [NotificationType.Twap]: 'TWAP',
   [NotificationType.TwapAlerts]: 'TWAP Alerts',
+  [NotificationType.LiquidityHub]: 'Liquidity Hub',
   [NotificationType.LiquidityHubAlerts]: 'Liquidity Hub Alerts',
+  [NotificationType.DefiNotifications]: 'DeFi Notifications',
   [NotificationType.DefiNotificationsAlerts]: 'DeFi Notifications Alerts',
   [NotificationType.EvmNodesStatus]: 'EVM Nodes Status',
   [NotificationType.EvmNodesAlerts]: 'EVM Nodes Alerts',
+};
+
+export const NotificationTypeUrls = {
+  [NotificationType.WalletManager]: 'https://services-healthpage.orbs.network/#/wallets-manager',
+  [NotificationType.WalletManagerAlerts]:
+    'https://services-healthpage.orbs.network/#/wallets-manager',
+  [NotificationType.Twap]: 'https://services-healthpage.orbs.network/#/twap',
+  [NotificationType.TwapAlerts]: 'https://services-healthpage.orbs.network/#/twap',
+  [NotificationType.LiquidityHub]: 'https://services-healthpage.orbs.network/#/clob',
+  [NotificationType.LiquidityHubAlerts]: 'https://services-healthpage.orbs.network/#/clob',
+  [NotificationType.DefiNotifications]:
+    'https://services-healthpage.orbs.network/#/defi-notifications',
+  [NotificationType.DefiNotificationsAlerts]:
+    'https://services-healthpage.orbs.network/#/defi-notifications',
+  [NotificationType.EvmNodesStatus]: 'https://services-healthpage.orbs.network/#/evm-nodes',
+  [NotificationType.EvmNodesAlerts]: 'https://services-healthpage.orbs.network/#/evm-nodes',
 };
 
 export const AlertTypes = [

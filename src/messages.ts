@@ -10,9 +10,8 @@ import { EvmNodes } from './evm-nodes';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
-    case NotificationType.WalletManager: {
+    case NotificationType.WalletManager:
       return await WalletManager.report();
-    }
     case NotificationType.Twap:
       return await Twap.report();
     case NotificationType.LiquidityHub:
