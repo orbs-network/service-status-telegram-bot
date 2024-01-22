@@ -327,10 +327,27 @@ const alertScheduler = new CronJob('0 */10 * * * *', async () => {
 
           await db.deleteAlert(existingAlert.id);
         }
-        await bot.telegram.sendMessage(chatId, alert.message, {
-          parse_mode: 'Markdown',
-        });
-        await db.insertAlert(alert);
+
+        // if new alert, check again 3 times every 3 seconds then send message
+        let alertCount = 0;
+        for (let i = 0; i < 3; i++) {
+          const sameAlerts = await getAlerts(notificationType);
+
+          for (const a of sameAlerts) {
+            if (a.message === alert.message) {
+              alertCount++;
+            }
+
+            await wait(3000);
+          }
+        }
+
+        if (alertCount == 3) {
+          await bot.telegram.sendMessage(chatId, alert.message, {
+            parse_mode: 'Markdown',
+          });
+          await db.insertAlert(alert);
+        }
         await wait(1000);
       }
     } catch (err) {
