@@ -17,25 +17,26 @@ export class EvmNodes {
   static async loadEvmNodes() {
     const statuses: EvmNodeStatus[] = [];
 
-    try {
-      const results = await Promise.allSettled(
-        evmNodes.map(async (node) => {
+    const results = await Promise.allSettled(
+      evmNodes.map(async (node) => {
+        try {
           const response = await fetch(node.url);
 
           const data = (await response.json()) as EvmNodeStatus;
           return { ...data, name: node.name };
-        })
-      );
-
-      for (const result of results) {
-        if (result.status === 'rejected') {
-          continue;
+        } catch (err) {
+          console.error('Error loading EVM nodes', err);
+          return { name: node.name, status: 'ERROR: fetching node status' };
         }
+      })
+    );
 
-        statuses.push(result.value);
+    for (const result of results) {
+      if (result.status === 'rejected') {
+        continue;
       }
-    } catch (err) {
-      console.error('Error loading EVM nodes', err);
+
+      statuses.push(result.value);
     }
     return statuses;
   }
