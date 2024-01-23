@@ -286,7 +286,7 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
       }
 
       const button = Markup.button.url(
-        '📊 View Status Page',
+        '🔗 Open Status Page',
         NotificationTypeUrls[notificationType]
       );
 
