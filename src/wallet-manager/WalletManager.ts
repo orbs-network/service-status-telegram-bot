@@ -9,7 +9,7 @@ const WalletManagerEndpoint = 'https://wallet-manager-1-a1922d7bed1d.herokuapp.c
 export class WalletManager {
   static async report() {
     let output = '📊 *WALLET MANAGER*\n\n';
-
+    let errors = '';
     try {
       const result = await axios.get<WalletManagerResponse>(WalletManagerEndpoint);
 
@@ -22,18 +22,23 @@ export class WalletManager {
         ...Object.entries(result.data.networks).map(([name, network]) => {
           const availableWallets = Object.entries(network.wallets.availableWallets).length;
           const unusableWallets = Object.entries(network.wallets.unusableWallets).length;
-
+          if (network.status !== 'OK') {
+            errors += `- *${name}*: ${network.status}\n`;
+          }
           return [
             name,
             availableWallets,
             unusableWallets,
             network.errorCount,
-            network.status === 'OK' ? '✅' : network.status,
+            network.status === 'OK' ? '✅' : '❌',
           ];
         }),
       ];
 
       output += `\`\`\`\n${table(tableOutput, { ...config.AsciiTableOpts })}\n\`\`\``;
+      if (errors.length > 0) {
+        output += `\n\n❌ *ERRORS*:\n\n${errors}`;
+      }
     } catch (error) {
       console.error(error);
 

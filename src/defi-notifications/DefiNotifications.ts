@@ -41,13 +41,23 @@ export class DefiNotifications {
 
   static async report() {
     let output = `📊 *${NotificationTypeNames[NotificationType.DefiNotifications]}*\n\n`;
+    let errors = '';
     try {
       const statuses = await DefiNotifications.loadStatuses();
-      const tableOutput = statuses.map((status) => [
-        truncate(status.name, 20),
-        status.status === 'OK' ? '✅' : status.status,
-      ]);
+      const tableOutput = [
+        ['', 'Status'],
+        ...statuses.map((status) => {
+          if (status.status !== 'OK') {
+            errors += `- *${status.name}*: ${status.status}\n`;
+          }
+
+          return [truncate(status.name, 20), status.status === 'OK' ? '✅' : '❌'];
+        }),
+      ];
       output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
+      if (errors.length > 0) {
+        output += `\n\n❌ *ERRORS*:\n\n${errors}`;
+      }
     } catch (err) {
       console.error('Error running Defi report', err);
       output += 'Error running Defi report';

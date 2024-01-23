@@ -72,18 +72,27 @@ export class Twap {
 
   static async report() {
     let output = '📊 *TWAP Takers*\n\n';
+    let errors = '';
     try {
       const takers = await Twap.loadBackupTakers();
       const tableOutput = [
         ['', 'Bids', 'Fills', 'Status'],
-        ...takers.map((taker) => [
-          truncate(taker.name, 20),
-          taker.bids,
-          taker.fills,
-          taker.status === 'OK' ? '✅' : taker.status,
-        ]),
+        ...takers.map((taker) => {
+          if (taker.status !== 'OK') {
+            errors += `- *${taker.name}*: ${taker.status}\n`;
+          }
+          return [
+            truncate(taker.name, 20),
+            taker.bids,
+            taker.fills,
+            taker.status === 'OK' ? '✅' : '❌',
+          ];
+        }),
       ];
       output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
+      if (errors.length > 0) {
+        output += `\n\n❌ *ERRORS*:\n\n${errors}`;
+      }
     } catch (err) {
       console.error('Error running TWAP report', err);
       output += 'Error running TWAP report';

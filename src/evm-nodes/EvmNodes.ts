@@ -43,16 +43,22 @@ export class EvmNodes {
 
   static async report() {
     let output = '📊 *EVM Nodes*\n\n';
+    let errors = '';
     try {
       const nodes = await EvmNodes.loadEvmNodes();
       const tableOutput = [
         ['', 'Status'],
-        ...nodes.map((node) => [
-          truncate(node.name, 20),
-          node.status === 'OK' ? '✅' : node.status,
-        ]),
+        ...nodes.map((node) => {
+          if (node.status !== 'OK') {
+            errors += `- *${node.name}*: ${node.status}\n`;
+          }
+          return [truncate(node.name, 20), node.status === 'OK' ? '✅' : '❌'];
+        }),
       ];
       output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
+      if (errors.length > 0) {
+        output += `\n\n❌ *ERRORS*:\n\n${errors}`;
+      }
     } catch (err) {
       console.error('Error running EVM Nodes report', err);
       output += 'Error running EVM Nodes report';
