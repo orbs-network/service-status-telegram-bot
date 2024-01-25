@@ -26,7 +26,7 @@ export class EvmNodes {
           return { ...data, name: node.name };
         } catch (err) {
           console.error('Error loading EVM nodes', err);
-          return { name: node.name, status: 'ERROR: fetching node status' };
+          return { name: node.name, status: 'ERROR - fetching node status' };
         }
       })
     );
