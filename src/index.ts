@@ -328,18 +328,16 @@ const alertScheduler = new CronJob('0 */10 * * * *', async () => {
           await db.deleteAlert(existingAlert.id);
         }
 
-        // if new alert, check again 3 times every 3 seconds then send message
+        // if new alert, check again 3 times every 10 seconds then send message
         let alertCount = 0;
         for (let i = 0; i < 3; i++) {
           const sameAlerts = await getAlerts(notificationType);
 
-          for (const a of sameAlerts) {
-            if (a.message === alert.message) {
-              alertCount++;
-            }
-
-            await wait(3000);
+          if (sameAlerts.find((a) => a.message === alert.message)) {
+            alertCount++;
           }
+
+          await wait(10000);
         }
 
         if (alertCount == 3) {
