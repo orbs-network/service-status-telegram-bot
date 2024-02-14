@@ -337,7 +337,7 @@ const alertScheduler = new CronJob('0 */10 * * * *', async () => {
             alertCount++;
           }
 
-          await wait(10000);
+          await wait(60000);
         }
 
         if (alertCount == 3) {
