@@ -332,8 +332,14 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
           await db.deleteAlert(existingAlert.id);
         }
 
+        const button = Markup.button.url(
+          '🔗 Open Status Page',
+          NotificationTypeUrls[notificationType]
+        );
+
         await bot.telegram.sendMessage(chatId, alert.message, {
           parse_mode: 'Markdown',
+          reply_markup: Markup.inlineKeyboard([button]).reply_markup,
         });
         await db.insertAlert(alert);
       }
@@ -384,8 +390,13 @@ const evmAlertScheduler = new CronJob('*/10 * * * *', async () => {
       }
 
       if (alertCount == 3) {
+        const button = Markup.button.url(
+          '🔗 Open Status Page',
+          NotificationTypeUrls[notificationType]
+        );
         await bot.telegram.sendMessage(chatId, alert.message, {
           parse_mode: 'Markdown',
+          reply_markup: Markup.inlineKeyboard([button]).reply_markup,
         });
         await db.insertAlert(alert);
       }
