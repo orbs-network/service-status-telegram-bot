@@ -314,7 +314,7 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   }
 
   const notificationTypes = Object.values(NotificationType).filter(
-    (n) => n !== NotificationType.EvmNodesStatus
+    (n) => n !== NotificationType.EvmNodesAlerts
   );
   for (const notificationType of notificationTypes) {
     await wait(1000);
