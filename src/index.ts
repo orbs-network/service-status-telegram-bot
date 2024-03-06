@@ -302,7 +302,8 @@ const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
   }
 });
 
-const alertScheduler = new CronJob('0 */10 * * * *', async () => {
+// every 30 seconds
+const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running alertScheduler...');
 
@@ -312,8 +313,11 @@ const alertScheduler = new CronJob('0 */10 * * * *', async () => {
     return;
   }
 
-  const notificationTypes = Object.values(NotificationType);
+  const notificationTypes = Object.values(NotificationType).filter(
+    (n) => n !== NotificationType.EvmNodesStatus
+  );
   for (const notificationType of notificationTypes) {
+    await wait(1000);
     try {
       const alerts = await getAlerts(notificationType);
 
@@ -328,30 +332,67 @@ const alertScheduler = new CronJob('0 */10 * * * *', async () => {
           await db.deleteAlert(existingAlert.id);
         }
 
-        // if new alert, check again 3 times every 10 seconds then send message
-        let alertCount = 0;
-        for (let i = 0; i < 3; i++) {
-          const sameAlerts = await getAlerts(notificationType);
-
-          if (sameAlerts.find((a) => a.message === alert.message)) {
-            alertCount++;
-          }
-
-          await wait(60000);
-        }
-
-        if (alertCount == 3) {
-          await bot.telegram.sendMessage(chatId, alert.message, {
-            parse_mode: 'Markdown',
-          });
-          await db.insertAlert(alert);
-        }
-        await wait(1000);
+        await bot.telegram.sendMessage(chatId, alert.message, {
+          parse_mode: 'Markdown',
+        });
+        await db.insertAlert(alert);
       }
     } catch (err) {
       console.log('An error occurred when sending alerts', err);
       // Handle the error (retry, notify user, etc.)
     }
+  }
+});
+
+// every 10 minutes
+const evmAlertScheduler = new CronJob('*/10 * * * *', async () => {
+  // Your post_info_proposals_daily logic here
+  console.log('Running evmAlertScheduler...');
+
+  const chatId = config.AlertGroupChatId;
+
+  if (!chatId) {
+    return;
+  }
+
+  const notificationType = NotificationType.EvmNodesAlerts;
+
+  try {
+    const alerts = await getAlerts(notificationType);
+
+    for (const alert of alerts) {
+      const existingAlert = await db.getAlert(alert);
+      if (existingAlert) {
+        const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
+        if (diff < 1) {
+          continue;
+        }
+
+        await db.deleteAlert(existingAlert.id);
+      }
+
+      // if new alert, check again 3 times every 10 seconds then send message
+      let alertCount = 0;
+      for (let i = 0; i < 3; i++) {
+        const sameAlerts = await getAlerts(notificationType);
+
+        if (sameAlerts.find((a) => a.message === alert.message)) {
+          alertCount++;
+        }
+
+        await wait(60000);
+      }
+
+      if (alertCount == 3) {
+        await bot.telegram.sendMessage(chatId, alert.message, {
+          parse_mode: 'Markdown',
+        });
+        await db.insertAlert(alert);
+      }
+    }
+  } catch (err) {
+    console.log('An error occurred when sending alerts', err);
+    // Handle the error (retry, notify user, etc.)
   }
 });
 
@@ -365,6 +406,7 @@ bot.telegram.setMyCommands([
 bot.launch();
 dailyReportScheduler.start();
 alertScheduler.start();
+evmAlertScheduler.start();
 
 console.log('Orbs Status Bot is up and running!');
 
