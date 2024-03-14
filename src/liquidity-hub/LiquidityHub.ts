@@ -38,7 +38,6 @@ export class LiquidityHub {
             total: { bids: number };
           };
         } catch (err) {
-          console.error('Error parsing LH json', err);
           continue;
         }
 
