@@ -1,11 +1,12 @@
-import * as sqlite3 from 'sqlite3';
 import { Alert, AlertDb, Notification, NotificationType } from './types';
+import { Database as DB } from '@sqlitecloud/drivers';
 
 export class Database {
   private db;
 
   constructor() {
-    this.db = new sqlite3.Database('orbs-status-bot.db');
+    // this.db = new sqlite3.Database('orbs-status-bot.db');
+    this.db = new DB('sqlitecloud://orbs:sjj1weXzW6@nzmavv6ask.sqlite.cloud:8860/orbs-status-bot');
 
     const createNotificationsTable = `
       CREATE TABLE IF NOT EXISTS notifications (
@@ -87,9 +88,14 @@ export class Database {
       this.db.all(
         'SELECT * FROM notifications WHERE chatId = ?',
         [chatId],
-        (err, rows: Notification[]) => {
+        (err, rows: Notification[] | undefined) => {
           if (err) {
             reject(err);
+            return;
+          }
+
+          if (!rows) {
+            resolve([]);
             return;
           }
 
@@ -104,9 +110,14 @@ export class Database {
       this.db.all(
         'SELECT * FROM notifications WHERE notificationType = ?',
         [notificationType],
-        (err, rows: Notification[]) => {
+        (err, rows: Notification[] | undefined) => {
           if (err) {
             reject(err);
+            return;
+          }
+
+          if (!rows) {
+            resolve([]);
             return;
           }
 
@@ -118,14 +129,23 @@ export class Database {
 
   get(id: string): Promise<Notification> {
     return new Promise<Notification>((resolve, reject) => {
-      this.db.get('SELECT * FROM notifications WHERE id = ?', [id], (err, row: Notification) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+      this.db.get(
+        'SELECT * FROM notifications WHERE id = ?',
+        [id],
+        (err, row: Notification | undefined) => {
+          if (err) {
+            reject(err);
+            return;
+          }
 
-        resolve(row);
-      });
+          if (!row) {
+            reject(new Error('Notification not found'));
+            return;
+          }
+
+          resolve(row);
+        }
+      );
     });
   }
 
@@ -176,9 +196,14 @@ export class Database {
     const id = this.getAlertId(alert);
 
     return new Promise<AlertDb>((resolve, reject) => {
-      this.db.get('SELECT * FROM alerts WHERE id = ?', [id], (err, row: AlertDb) => {
+      this.db.get('SELECT * FROM alerts WHERE id = ?', [id], (err, row: AlertDb | undefined) => {
         if (err) {
           reject(err);
+          return;
+        }
+
+        if (!row) {
+          reject(new Error('Alert not found'));
           return;
         }
 

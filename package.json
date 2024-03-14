@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sqlitecloud/drivers": "^0.0.56",
     "axios": "^1.6.2",
     "cron": "^3.1.6",
     "date-fns": "^3.0.0",

@@ -6,13 +6,7 @@ import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
-import {
-  AlertTypes,
-  NotificationType,
-  NotificationTypeNames,
-  NotificationTypeUrls,
-  StatusTypes,
-} from './types';
+import { NotificationType, NotificationTypeNames, NotificationTypeUrls } from './types';
 import { differenceInHours } from 'date-fns';
 import { Twap } from './twap';
 import { LiquidityHub } from './liquidity-hub';
@@ -181,15 +175,17 @@ bot.command('admin', async (ctx) => {
       return;
     }
 
-    const notificationTypes =
-      ctx.chat.id === parseInt(config.StatusGroupChatId || '0') ? StatusTypes : AlertTypes;
+    const subscriptions = await db.getByChatId(ctx.chat.id);
 
-    const buttons = notificationTypes.map((item) => [
-      Markup.button.callback(NotificationTypeNames[item], `report:${item}`),
-      // Markup.button.callback('🗑️', `rm:${item.notificationType}`),
+    const buttons = subscriptions.map((item) => [
+      Markup.button.callback(
+        NotificationTypeNames[item.notificationType],
+        `report:${item.notificationType}`
+      ),
+      Markup.button.callback('🗑️', `rm:${item.notificationType}`),
     ]);
 
-    // buttons.push([Markup.button.callback('🪄 Subscribe', 'subscribe')]);
+    buttons.push([Markup.button.callback('🪄 Subscribe', 'subscribe')]);
     buttons.push([Markup.button.callback('❌ Close', 'close')]);
 
     await ctx.reply(
@@ -267,20 +263,30 @@ bot.action(/^rm:/g, async (ctx) => {
   }
 });
 
-const dailyReportScheduler = new CronJob('0 0 12 * * *', async () => {
+const dailyReportScheduler = new CronJob('0 0 7 * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running dailyReportScheduler...');
 
-  const chatId = config.StatusGroupChatId;
-
-  if (!chatId) {
-    return;
-  }
+  const dailySnapshot: Record<NotificationType, string> = {} as Record<NotificationType, string>;
 
   const notificationTypes = Object.values(NotificationType);
   for (const notificationType of notificationTypes) {
     try {
-      const message = await getDailyReport(notificationType);
+      const report = await getDailyReport(notificationType);
+      if (!report) {
+        continue;
+      }
+      dailySnapshot[notificationType] = report;
+    } catch (err) {
+      console.log('An error occurred when sending daily report', err);
+      // Handle the error (retry, notify user, etc.)
+    }
+  }
+
+  const notifications = await db.getAll();
+  for (const { chatId, notificationType } of notifications) {
+    try {
+      const message = dailySnapshot[notificationType];
       if (!message) {
         continue;
       }
@@ -307,12 +313,6 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running alertScheduler...');
 
-  const chatId = config.AlertGroupChatId;
-
-  if (!chatId) {
-    return;
-  }
-
   const notificationTypes = Object.values(NotificationType).filter(
     (n) => n !== NotificationType.EvmNodesAlerts
   );
@@ -320,6 +320,10 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
     await wait(1000);
     try {
       const alerts = await getAlerts(notificationType);
+      const button = Markup.button.url(
+        '🔗 Open Status Page',
+        NotificationTypeUrls[notificationType]
+      );
 
       for (const alert of alerts) {
         const existingAlert = await db.getAlert(alert);
@@ -332,15 +336,21 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
           await db.deleteAlert(existingAlert.id);
         }
 
-        const button = Markup.button.url(
-          '🔗 Open Status Page',
-          NotificationTypeUrls[notificationType]
-        );
+        const notifications = await db.getByNotificationType(notificationType);
+        for (const { chatId } of notifications) {
+          try {
+            await bot.telegram.sendMessage(chatId, alert.message, {
+              parse_mode: 'Markdown',
+              reply_markup: Markup.inlineKeyboard([button]).reply_markup,
+            });
 
-        await bot.telegram.sendMessage(chatId, alert.message, {
-          parse_mode: 'Markdown',
-          reply_markup: Markup.inlineKeyboard([button]).reply_markup,
-        });
+            await wait(1000);
+          } catch (err) {
+            console.log('An error occurred when sending alerts', err);
+            // Handle the error (retry, notify user, etc.)
+          }
+        }
+
         await db.insertAlert(alert);
       }
     } catch (err) {
@@ -355,16 +365,11 @@ const evmAlertScheduler = new CronJob('*/10 * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running evmAlertScheduler...');
 
-  const chatId = config.AlertGroupChatId;
-
-  if (!chatId) {
-    return;
-  }
-
   const notificationType = NotificationType.EvmNodesAlerts;
 
   try {
     const alerts = await getAlerts(notificationType);
+    const button = Markup.button.url('🔗 Open Status Page', NotificationTypeUrls[notificationType]);
 
     for (const alert of alerts) {
       const existingAlert = await db.getAlert(alert);
@@ -377,7 +382,7 @@ const evmAlertScheduler = new CronJob('*/10 * * * *', async () => {
         await db.deleteAlert(existingAlert.id);
       }
 
-      // if new alert, check again 3 times every 10 seconds then send message
+      // if new alert, check again every minute for 3 minutes then send message
       let alertCount = 0;
       for (let i = 0; i < 3; i++) {
         const sameAlerts = await getAlerts(notificationType);
@@ -390,14 +395,19 @@ const evmAlertScheduler = new CronJob('*/10 * * * *', async () => {
       }
 
       if (alertCount == 3) {
-        const button = Markup.button.url(
-          '🔗 Open Status Page',
-          NotificationTypeUrls[notificationType]
-        );
-        await bot.telegram.sendMessage(chatId, alert.message, {
-          parse_mode: 'Markdown',
-          reply_markup: Markup.inlineKeyboard([button]).reply_markup,
-        });
+        const notifications = await db.getByNotificationType(notificationType);
+        for (const { chatId } of notifications) {
+          try {
+            await bot.telegram.sendMessage(chatId, alert.message, {
+              parse_mode: 'Markdown',
+              reply_markup: Markup.inlineKeyboard([button]).reply_markup,
+            });
+          } catch (err) {
+            console.log('An error occurred when sending alerts', err);
+            // Handle the error (retry, notify user, etc.)
+          }
+        }
+
         await db.insertAlert(alert);
       }
     }
