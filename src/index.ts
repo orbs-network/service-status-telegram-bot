@@ -1,17 +1,12 @@
 import { Telegraf, Context, Markup } from 'telegraf';
 import { CallbackQuery, Update } from 'telegraf/types';
 import { config } from './config';
-import { WalletManager } from './wallet-manager';
 import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
 import { NotificationType, NotificationTypeNames, NotificationTypeUrls } from './types';
 import { differenceInHours } from 'date-fns';
-import { Twap } from './twap';
-import { LiquidityHub } from './liquidity-hub';
-import { DefiNotifications } from './defi-notifications';
-import { EvmNodes } from './evm-nodes';
 
 if (!config.BotToken) {
   throw new Error('Bot token missing!');
@@ -46,42 +41,6 @@ bot.command('info', async (ctx) => {
     }
   );
   return;
-});
-
-bot.command('walletmanager', async (ctx) => {
-  const output = await WalletManager.report();
-
-  ctx.reply(output, {
-    parse_mode: 'Markdown',
-  });
-});
-
-bot.command('twap', async (ctx) => {
-  const output = await Twap.report();
-  ctx.reply(output, {
-    parse_mode: 'Markdown',
-  });
-});
-
-bot.command('lh', async (ctx) => {
-  const output = await LiquidityHub.report();
-  ctx.reply(output, {
-    parse_mode: 'Markdown',
-  });
-});
-
-bot.command('defi', async (ctx) => {
-  const output = await DefiNotifications.report();
-  ctx.reply(output, {
-    parse_mode: 'Markdown',
-  });
-});
-
-bot.command('evm', async (ctx) => {
-  const output = await EvmNodes.report();
-  ctx.reply(output, {
-    parse_mode: 'Markdown',
-  });
 });
 
 bot.on('my_chat_member', async (ctx) => {
