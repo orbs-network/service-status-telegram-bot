@@ -133,19 +133,14 @@ export class Database {
     });
   }
 
-  get(id: string): Promise<Notification> {
-    return new Promise<Notification>((resolve, reject) => {
+  get(id: string): Promise<Notification | undefined> {
+    return new Promise<Notification | undefined>((resolve, reject) => {
       this.db.get(
         'SELECT * FROM notifications WHERE id = ?',
         [id],
         (err, row: Notification | undefined) => {
           if (err) {
             reject(err);
-            return;
-          }
-
-          if (!row) {
-            reject(new Error('Notification not found'));
             return;
           }
 
@@ -198,18 +193,13 @@ export class Database {
     return `${notificationType}:${alertType}:${name}`;
   }
 
-  async getAlert(alert: Alert): Promise<AlertDb> {
+  async getAlert(alert: Alert): Promise<AlertDb | undefined> {
     const id = this.getAlertId(alert);
 
-    return new Promise<AlertDb>((resolve, reject) => {
+    return new Promise<AlertDb | undefined>((resolve, reject) => {
       this.db.get('SELECT * FROM alerts WHERE id = ?', [id], (err, row: AlertDb | undefined) => {
         if (err) {
           reject(err);
-          return;
-        }
-
-        if (!row) {
-          reject(new Error('Alert not found'));
           return;
         }
 
