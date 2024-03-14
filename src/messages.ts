@@ -1,12 +1,12 @@
 import { Context, Markup } from 'telegraf';
 import { WalletManager } from './wallet-manager';
-import { config } from './config';
 import { NotificationType, NotificationTypeNames } from './types';
 import { Twap } from './twap';
 import { Database } from './db';
 import { LiquidityHub } from './liquidity-hub';
 import { DefiNotifications } from './defi-notifications';
 import { EvmNodes } from './evm-nodes';
+import { Perps } from './perps';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -20,6 +20,8 @@ export async function getDailyReport(notificationType: NotificationType) {
       return await DefiNotifications.report();
     case NotificationType.EvmNodesStatus:
       return await EvmNodes.report();
+    case NotificationType.PerpsDailyReport:
+      return await Perps.report();
     default:
       return null;
   }
@@ -27,9 +29,8 @@ export async function getDailyReport(notificationType: NotificationType) {
 
 export async function getAlerts(notificationType: NotificationType) {
   switch (notificationType) {
-    case NotificationType.WalletManagerAlerts: {
+    case NotificationType.WalletManagerAlerts:
       return await WalletManager.alerts();
-    }
     case NotificationType.TwapAlerts:
       return await Twap.alerts();
     case NotificationType.LiquidityHubAlerts:

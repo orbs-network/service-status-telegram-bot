@@ -9,6 +9,7 @@ export enum NotificationType {
   DefiNotificationsAlerts = 'DefiNotificationsAlerts',
   EvmNodesStatus = 'EvmNodesStatus',
   EvmNodesAlerts = 'EvmNodesAlerts',
+  PerpsDailyReport = 'PerpsDailyReport',
 }
 
 export const NotificationTypeNames = {
@@ -22,6 +23,7 @@ export const NotificationTypeNames = {
   [NotificationType.DefiNotificationsAlerts]: 'DeFi Notifications Alerts',
   [NotificationType.EvmNodesStatus]: 'EVM Nodes Status',
   [NotificationType.EvmNodesAlerts]: 'EVM Nodes Alerts',
+  [NotificationType.PerpsDailyReport]: 'Perps Daily Report',
 };
 
 export const NotificationTypeUrls = {
@@ -38,6 +40,7 @@ export const NotificationTypeUrls = {
     'https://services-healthpage.orbs.network/#/defi-notifications',
   [NotificationType.EvmNodesStatus]: 'https://services-healthpage.orbs.network/#/evm-nodes',
   [NotificationType.EvmNodesAlerts]: 'https://services-healthpage.orbs.network/#/evm-nodes',
+  [NotificationType.PerpsDailyReport]: 'https://staging-perps.orbs.network',
 };
 
 export const AlertTypes = [
@@ -54,6 +57,7 @@ export const StatusTypes = [
   NotificationType.LiquidityHub,
   NotificationType.DefiNotifications,
   NotificationType.EvmNodesStatus,
+  NotificationType.PerpsDailyReport,
 ];
 
 export type Notification = {
