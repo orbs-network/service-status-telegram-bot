@@ -11,7 +11,13 @@ export class Perps {
   static async report() {
     let output = `📊 *Perps Daily Report* - ${format(subDays(new Date(), 1), 'dd/MM/yyyy')}\n\n`;
     try {
-      const resp = await fetch(kibanaEndpoint, { body: getQuery() });
+      const resp = await fetch(kibanaEndpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(getQuery()),
+      });
 
       const data = (await resp.json()) as ElasticsearchResponse;
 
