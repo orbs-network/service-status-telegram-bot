@@ -118,7 +118,7 @@ bot.command('subscribe', async (ctx) => {
   await subscribe(ctx, db, ctx.from.id);
 });
 
-bot.action('subscribe', async (ctx) => {
+bot.action('showAlerts', async (ctx) => {
   if (!ctx.callbackQuery) {
     return;
   }
@@ -130,6 +130,7 @@ bot.action('subscribe', async (ctx) => {
   }
 
   await subscribe(ctx, db, fromId);
+  ctx.deleteMessage(ctx.callbackQuery.message?.message_id);
 });
 
 bot.action(/^subscribe:/g, async (ctx) => {
@@ -177,15 +178,21 @@ bot.command('admin', async (ctx) => {
 
     const subscriptions = await db.getByChatId(ctx.chat.id);
 
-    const buttons = subscriptions.map((item) => [
-      Markup.button.callback(
-        NotificationTypeNames[item.notificationType],
-        `report:${item.notificationType}`
-      ),
-      Markup.button.callback('🗑️', `rm:${item.notificationType}`),
-    ]);
+    const buttons = [];
 
-    buttons.push([Markup.button.callback('🪄 Subscribe', 'subscribe')]);
+    buttons.push([Markup.button.callback('Subscriptions', 'title')]);
+
+    subscriptions.forEach((item) => {
+      buttons.push([
+        Markup.button.callback(
+          NotificationTypeNames[item.notificationType],
+          `report:${item.notificationType}`
+        ),
+        Markup.button.callback('🗑️', `rm:${item.notificationType}`),
+      ]);
+    });
+
+    buttons.push([Markup.button.callback('🪄 Subscribe to alerts', 'showAlerts')]);
     buttons.push([Markup.button.callback('❌ Close', 'close')]);
 
     await ctx.reply(
