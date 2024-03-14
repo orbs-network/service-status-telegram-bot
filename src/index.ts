@@ -153,7 +153,7 @@ bot.command('admin', async (ctx) => {
       ]);
     });
 
-    buttons.push([Markup.button.callback('🪄 Subscribe to alerts', 'showAlerts')]);
+    buttons.push([Markup.button.callback('🪄 Add alerts', 'showAlerts')]);
     buttons.push([Markup.button.callback('❌ Close', 'close')]);
 
     await ctx.reply(
