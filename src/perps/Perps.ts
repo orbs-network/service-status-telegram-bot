@@ -1,11 +1,13 @@
 import { table } from 'table';
 import { config } from '../config';
 import { getQuery } from './query';
-import { ElasticsearchResponse } from './types';
+import { ElasticsearchResponse, PairExposureComparison } from './types';
 import { dollar } from '../utils';
 import { format, subDays } from 'date-fns';
+import { Alert, NotificationType } from '../types';
 
 const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-hedger*/_search';
+const hedgerEndpoint = 'http://ec2-52-58-216-28.eu-central-1.compute.amazonaws.com:3001';
 
 export class Perps {
   static async report() {
@@ -66,5 +68,34 @@ export class Perps {
       output += '\nError running Perps report';
     }
     return output;
+  }
+
+  static async alerts() {
+    const alerts: Alert[] = [];
+    try {
+      const resp = await fetch(`${hedgerEndpoint}/exposure-comparison`);
+      if (resp.status !== 200) {
+        throw new Error('Error fetching hedger exposure');
+      }
+
+      const data = (await resp.json()) as PairExposureComparison[];
+
+      data.forEach((d) => {
+        if (d.quantityDelta > 0) {
+          alerts.push({
+            notificationType: NotificationType.PerpsExposureAlerts,
+            alertType: 'PerpsExposure',
+            name: d.symbol,
+            timestamp: new Date().getTime(),
+            message: `🚨 *PERPS EXPOSURE* 🚨\n\n*${d.symbol}*: ${dollar.format(
+              d.quantityDelta * d.markPrice
+            )}`,
+          });
+        }
+      });
+    } catch (err) {
+      console.error('Error running Perps alerts', err);
+    }
+    return alerts;
   }
 }

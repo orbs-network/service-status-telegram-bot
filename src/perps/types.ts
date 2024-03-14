@@ -88,3 +88,20 @@ interface HitItem {
 interface Value {
   value: number;
 }
+
+export type PairExposureComparison = {
+  symbol: string;
+  markPrice: number;
+  onchainQuantity: number;
+  brokerQuantity: number;
+  quantityDelta: number;
+  quantityDeltaPercentage: number | string;
+  onchainEntryPrice: number;
+  brokerEntryPrice: number;
+  entryPriceDelta: number;
+  entryPriceDeltaPercentage: number | string;
+  onchainUnPnl: number;
+  brokerUnPnl: number;
+  unPnlDelta: number;
+  unPnlDeltaPercentage: number | string;
+};
