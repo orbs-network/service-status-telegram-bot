@@ -24,18 +24,21 @@ export class Perps {
       console.log(data);
 
       const marginBalance =
-        data.aggregations[0].buckets[0].marginBalance?.hits?.hits[0].fields.marginBalanceNum[0] ||
-        0;
+        data.aggregations[0].buckets[0].marginBalance?.marginBalance.hits?.hits[0].fields
+          .marginBalanceNum[0] || 0;
       const erc20Balance =
-        data.aggregations[0].buckets[0].erc20Balance?.hits?.hits[0].fields.erc20BalanceNum[0] || 0;
+        data.aggregations[0].buckets[0].erc20Balance?.erc20Balance.hits?.hits[0].fields
+          .erc20BalanceNum[0] || 0;
       const totalPartyBUnPnl =
-        data.aggregations[0].buckets[0].totalPartyBUnPnl?.hits?.hits[0].fields
+        data.aggregations[0].buckets[0].totalPartyBUnPnl?.totalPartyBUnPnl.hits?.hits[0].fields
           .totalPartyBUnPnl[0] || 0;
       const brokerUpnl =
-        data.aggregations[0].buckets[0].brokerUpnl?.hits?.hits[0].fields['upnl.keyword'][0] || 0;
+        data.aggregations[0].buckets[0].brokerUpnl?.brokerUpnl.hits?.hits[0].fields[
+          'upnl.keyword'
+        ][0] || 0;
       const partyBAllocatedBalance =
-        data.aggregations[0].buckets[0].partyBAllocatedBalance?.hits?.hits[0].fields
-          .partyBAllocatedBalanceNum[0] || 0;
+        data.aggregations[0].buckets[0].partyBAllocatedBalance?.partyBAllocatedBalance.hits?.hits[0]
+          .fields.partyBAllocatedBalanceNum[0] || 0;
       const volume = data.aggregations[0].buckets[0].volume?.volume.value || 0;
       const gasPaid = data.aggregations[0].buckets[0].gasPaid?.value || 0;
       const users = data.aggregations[0].buckets[0].users?.users.value || 0;

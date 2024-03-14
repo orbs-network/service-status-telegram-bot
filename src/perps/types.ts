@@ -31,14 +31,24 @@ interface Bucket {
   key: number;
   doc_count: number;
   volume?: DocCountValue;
-  erc20Balance?: DocCountHits;
-  totalPartyBUnPnl?: DocCountHits;
+  erc20Balance?: {
+    erc20Balance: DocCountHits;
+  };
+  totalPartyBUnPnl?: {
+    totalPartyBUnPnl: DocCountHits;
+  };
   gasPaid?: Value;
   trades?: DocCount;
-  brokerUpnl?: DocCountHits;
+  brokerUpnl?: {
+    brokerUpnl: DocCountHits;
+  };
   users?: DocCountValue;
-  marginBalance?: DocCountHits;
-  partyBAllocatedBalance?: DocCountHits;
+  marginBalance?: {
+    marginBalance: DocCountHits;
+  };
+  partyBAllocatedBalance?: {
+    partyBAllocatedBalance: DocCountHits;
+  };
 }
 
 interface DocCount {
