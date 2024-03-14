@@ -2,7 +2,7 @@ import { table } from 'table';
 import { BackupTaker, TwapAlert, TakerStatus } from './types';
 import { truncate } from '../utils';
 import { config } from '../config';
-import { Alert, NotificationType } from '../types';
+import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 export class Twap {
   static async loadBackupTakers() {
@@ -71,7 +71,7 @@ export class Twap {
   // }
 
   static async report() {
-    let output = '📊 *TWAP Takers*\n\n';
+    let output = `📊 *${NotificationTypeNames[NotificationType.Twap]}*\n\n`;
     let errors = '';
     try {
       const takers = await Twap.loadBackupTakers();
@@ -111,7 +111,9 @@ export class Twap {
             alertType: TwapAlert.TakerDown,
             name: taker.name,
             timestamp: taker.timestamp,
-            message: `🚨 *TWAP TAKER STATUS* 🚨\n\n*${taker.name}*: ${taker.status}`,
+            message: `🚨 *${NotificationTypeNames[NotificationType.TwapAlerts]}* 🚨\n\n*${
+              taker.name
+            }*: ${taker.status}`,
           });
         }
       });

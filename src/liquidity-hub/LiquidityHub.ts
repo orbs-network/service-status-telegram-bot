@@ -2,7 +2,7 @@ import { table, getBorderCharacters } from 'table';
 import { truncate } from '../utils';
 import { LiquidityHubAlert, LiquidityHubTaker } from './types';
 import { config } from '../config';
-import { Alert, NotificationType } from '../types';
+import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 export class LiquidityHub {
   static async loadBackupTakers() {
@@ -58,7 +58,7 @@ export class LiquidityHub {
   }
 
   static async report() {
-    let output = '📊 *LH Takers*\n\n';
+    let output = `📊 *${NotificationTypeNames[NotificationType.LiquidityHub]}*\n\n`;
     let errors = '';
     try {
       const takers = await LiquidityHub.loadBackupTakers();
@@ -94,7 +94,9 @@ export class LiquidityHub {
             alertType: LiquidityHubAlert.TakerDown,
             name: taker.name,
             timestamp: new Date().getTime(),
-            message: `🚨 *LH TAKER STATUS* 🚨\n\n*${taker.name}*: ${taker.status}`,
+            message: `🚨 *${NotificationTypeNames[NotificationType.LiquidityHubAlerts]}* 🚨\n\n*${
+              taker.name
+            }*: ${taker.status}`,
           });
         }
       });

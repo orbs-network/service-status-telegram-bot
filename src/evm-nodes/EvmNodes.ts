@@ -2,7 +2,7 @@ import { table } from 'table';
 import { truncate } from '../utils';
 import { EvmNodeAlert, EvmNodeStatus } from './types';
 import { config } from '../config';
-import { Alert, NotificationType } from '../types';
+import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 const evmNodes = [
   { url: 'http://107.6.163.146:3000/', name: 'Ethereum' },
@@ -42,7 +42,7 @@ export class EvmNodes {
   }
 
   static async report() {
-    let output = '📊 *EVM Nodes*\n\n';
+    let output = `📊 *${NotificationTypeNames[NotificationType.EvmNodesStatus]}*\n\n`;
     let errors = '';
     try {
       const nodes = await EvmNodes.loadEvmNodes();
@@ -77,7 +77,9 @@ export class EvmNodes {
             alertType: EvmNodeAlert.NodeDown,
             name: node.name,
             timestamp: new Date().getTime(),
-            message: `🚨 *EVM NODE STATUS* 🚨\n\n*${node.name}*: ${node.status}`,
+            message: `🚨 *${NotificationTypeNames[NotificationType.EvmNodesAlerts]}* 🚨\n\n*${
+              node.name
+            }*: ${node.status}`,
           });
         }
       });

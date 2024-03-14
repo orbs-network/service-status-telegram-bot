@@ -4,14 +4,17 @@ import { getQuery } from './query';
 import { ElasticsearchResponse, PairExposureComparison } from './types';
 import { dollar } from '../utils';
 import { format, subDays } from 'date-fns';
-import { Alert, NotificationType } from '../types';
+import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-hedger*/_search';
 const hedgerEndpoint = 'http://ec2-52-58-216-28.eu-central-1.compute.amazonaws.com:3001';
 
 export class Perps {
   static async report() {
-    let output = `📊 *Perps Daily Report* - ${format(subDays(new Date(), 1), 'dd/MM/yyyy')}\n\n`;
+    let output = `📊 *${NotificationTypeNames[NotificationType.PerpsDailyReport]}* - ${format(
+      subDays(new Date(), 1),
+      'dd/MM/yyyy'
+    )}\n\n`;
     try {
       const resp = await fetch(kibanaEndpoint, {
         method: 'POST',
@@ -87,9 +90,9 @@ export class Perps {
             alertType: 'PerpsExposure',
             name: d.symbol,
             timestamp: new Date().getTime(),
-            message: `🚨 *PERPS EXPOSURE* 🚨\n\n*${d.symbol}*: ${dollar.format(
-              d.quantityDelta * d.markPrice
-            )}`,
+            message: `🚨 *${NotificationTypeNames[NotificationType.PerpsExposureAlerts]}* 🚨\n\n*${
+              d.symbol
+            }*: ${dollar.format(d.quantityDelta * d.markPrice)}`,
           });
         }
       });

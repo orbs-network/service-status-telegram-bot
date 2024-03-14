@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { WalletManagerAlert, WalletManagerResponse } from './types';
 import { table } from 'table';
-import { Alert, NotificationType } from '../types';
+import { Alert, NotificationType, NotificationTypeNames } from '../types';
 import { config } from '../config';
 
 const WalletManagerEndpoint = 'https://wallet-manager-1-a1922d7bed1d.herokuapp.com/health';
 
 export class WalletManager {
   static async report() {
-    let output = '📊 *WALLET MANAGER*\n\n';
+    let output = `📊 *${NotificationTypeNames[NotificationType.WalletManager]}*\n\n`;
     let errors = '';
     try {
       const result = await axios.get<WalletManagerResponse>(WalletManagerEndpoint);
