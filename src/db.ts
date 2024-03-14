@@ -1,3 +1,4 @@
+import { config } from './config';
 import { Alert, AlertDb, Notification, NotificationType } from './types';
 import { Database as DB } from '@sqlitecloud/drivers';
 
@@ -6,7 +7,12 @@ export class Database {
 
   constructor() {
     // this.db = new sqlite3.Database('orbs-status-bot.db');
-    this.db = new DB('sqlitecloud://orbs:sjj1weXzW6@nzmavv6ask.sqlite.cloud:8860/orbs-status-bot');
+
+    if (!config.DBConnectionString) {
+      throw new Error('DB connection string is not defined');
+    }
+
+    this.db = new DB(config.DBConnectionString);
 
     const createNotificationsTable = `
       CREATE TABLE IF NOT EXISTS notifications (
