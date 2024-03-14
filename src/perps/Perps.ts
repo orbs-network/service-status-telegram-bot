@@ -12,11 +12,11 @@ export class Perps {
     let output = `📊 *Perps Daily Report* - ${format(subDays(new Date(), 1), 'dd/MM/yyyy')}\n\n`;
     try {
       const resp = await fetch(kibanaEndpoint, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(getQuery()),
+        body: getQuery(),
       });
 
       const data = (await resp.json()) as ElasticsearchResponse;
