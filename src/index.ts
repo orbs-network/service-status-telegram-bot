@@ -235,8 +235,11 @@ bot.action(/^report:/g, async (ctx) => {
       return;
     }
 
+    const button = Markup.button.url('🔗 View more', NotificationTypeUrls[notificationType]);
+
     ctx.reply(report, {
       parse_mode: 'Markdown',
+      reply_markup: Markup.inlineKeyboard([button]).reply_markup,
     });
     ctx.deleteMessage();
   } catch (err) {
@@ -300,10 +303,7 @@ const dailyReportScheduler = new CronJob('0 0 7 * * *', async () => {
         continue;
       }
 
-      const button = Markup.button.url(
-        '🔗 Open Status Page',
-        NotificationTypeUrls[notificationType]
-      );
+      const button = Markup.button.url('🔗 View more', NotificationTypeUrls[notificationType]);
 
       await bot.telegram.sendMessage(chatId, message, {
         parse_mode: 'Markdown',
@@ -329,10 +329,7 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
     await wait(1000);
     try {
       const alerts = await getAlerts(notificationType);
-      const button = Markup.button.url(
-        '🔗 Open Status Page',
-        NotificationTypeUrls[notificationType]
-      );
+      const button = Markup.button.url('🔗 View more', NotificationTypeUrls[notificationType]);
 
       for (const alert of alerts) {
         const existingAlert = await db.getAlert(alert);
