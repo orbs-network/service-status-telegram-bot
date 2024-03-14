@@ -180,7 +180,9 @@ bot.command('admin', async (ctx) => {
 
     const buttons = [];
 
-    buttons.push([Markup.button.callback('Subscriptions', 'title')]);
+    if (subscriptions.length > 0) {
+      buttons.push([Markup.button.callback('Subscriptions', 'title')]);
+    }
 
     subscriptions.forEach((item) => {
       buttons.push([
