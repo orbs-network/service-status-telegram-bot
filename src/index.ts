@@ -338,9 +338,6 @@ dailyReportScheduler.start();
 alertScheduler.start();
 evmAlertScheduler.start();
 
-// clear alerts on start up
-db.deleteAllAlerts();
-
 console.log('Orbs Status Bot is up and running!');
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
