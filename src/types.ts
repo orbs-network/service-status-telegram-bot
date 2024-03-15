@@ -81,4 +81,5 @@ export type Alert = {
 export type AlertDb = {
   id: string;
   timestamp: number;
+  count: number;
 };

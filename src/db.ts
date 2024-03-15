@@ -27,7 +27,8 @@ export class Database {
     const createAlertsTable = `
       CREATE TABLE IF NOT EXISTS alerts (
         id TEXT PRIMARY KEY NOT NULL,
-        timestamp INTEGER NOT NULL
+        timestamp INTEGER NOT NULL,
+        count INTEGER DEFAULT 1
       )
     `;
 
@@ -208,6 +209,19 @@ export class Database {
     });
   }
 
+  async getAlertById(id: string): Promise<AlertDb | undefined> {
+    return new Promise<AlertDb | undefined>((resolve, reject) => {
+      this.db.get('SELECT * FROM alerts WHERE id = ?', [id], (err, row: AlertDb | undefined) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(row);
+      });
+    });
+  }
+
   async insertAlert(newAlert: Alert): Promise<boolean> {
     const id = this.getAlertId(newAlert);
 
@@ -228,6 +242,25 @@ export class Database {
       `;
 
       this.db.run(insert, [id, newAlert.timestamp], (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(true);
+      });
+    });
+  }
+
+  async appendAlertCount(id: string): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      const update = `
+        UPDATE alerts
+        SET count = count + 1
+        WHERE id = ?
+      `;
+
+      this.db.run(update, [id], (err) => {
         if (err) {
           reject(err);
           return;

@@ -6,7 +6,7 @@ import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
 import { NotificationType, NotificationTypeNames, NotificationTypeUrls } from './types';
-import { differenceInHours } from 'date-fns';
+import { sendAlerts } from './alert-scheduler';
 
 if (!config.BotToken) {
   throw new Error('Bot token missing!');
@@ -284,40 +284,19 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   const notificationTypes = Object.values(NotificationType).filter(
     (n) => n !== NotificationType.EvmNodesAlerts
   );
+
   for (const notificationType of notificationTypes) {
-    await wait(1000);
     try {
       const alerts = await getAlerts(notificationType);
-      const button = Markup.button.url('🔗 View more', NotificationTypeUrls[notificationType]);
 
-      for (const alert of alerts) {
-        const existingAlert = await db.getAlert(alert);
-        if (existingAlert) {
-          const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
-          if (diff < 1) {
-            continue;
-          }
-
-          await db.deleteAlert(existingAlert.id);
-        }
-
-        const notifications = await db.getByNotificationType(notificationType);
-        for (const { chatId } of notifications) {
-          try {
-            await bot.telegram.sendMessage(chatId, alert.message, {
-              parse_mode: 'Markdown',
-              reply_markup: Markup.inlineKeyboard([button]).reply_markup,
-            });
-
-            await wait(1000);
-          } catch (err) {
-            console.log('An error occurred when sending alerts', err);
-            // Handle the error (retry, notify user, etc.)
-          }
-        }
-
-        await db.insertAlert(alert);
-      }
+      await sendAlerts({
+        db,
+        notificationType,
+        bot,
+        alerts,
+        buttonText: '🔗 View more',
+        alertThreshold: 2,
+      });
     } catch (err) {
       console.log('An error occurred when sending alerts', err);
       // Handle the error (retry, notify user, etc.)
@@ -325,57 +304,22 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   }
 });
 
-// every 10 minutes
-const evmAlertScheduler = new CronJob('*/10 * * * *', async () => {
+// every 1 minute
+const evmAlertScheduler = new CronJob('*/1 * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running evmAlertScheduler...');
 
-  const notificationType = NotificationType.EvmNodesAlerts;
-
   try {
-    const alerts = await getAlerts(notificationType);
-    const button = Markup.button.url('🔗 Open Status Page', NotificationTypeUrls[notificationType]);
+    const alerts = await getAlerts(NotificationType.EvmNodesAlerts);
 
-    for (const alert of alerts) {
-      const existingAlert = await db.getAlert(alert);
-      if (existingAlert) {
-        const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
-        if (diff < 1) {
-          continue;
-        }
-
-        await db.deleteAlert(existingAlert.id);
-      }
-
-      // if new alert, check again every minute for 3 minutes then send message
-      let alertCount = 0;
-      for (let i = 0; i < 3; i++) {
-        const sameAlerts = await getAlerts(notificationType);
-
-        if (sameAlerts.find((a) => a.message === alert.message)) {
-          alertCount++;
-        }
-
-        await wait(60000);
-      }
-
-      if (alertCount == 3) {
-        const notifications = await db.getByNotificationType(notificationType);
-        for (const { chatId } of notifications) {
-          try {
-            await bot.telegram.sendMessage(chatId, alert.message, {
-              parse_mode: 'Markdown',
-              reply_markup: Markup.inlineKeyboard([button]).reply_markup,
-            });
-          } catch (err) {
-            console.log('An error occurred when sending alerts', err);
-            // Handle the error (retry, notify user, etc.)
-          }
-        }
-
-        await db.insertAlert(alert);
-      }
-    }
+    await sendAlerts({
+      db,
+      notificationType: NotificationType.EvmNodesAlerts,
+      bot,
+      alerts,
+      buttonText: '🔗 Open Status Page',
+      alertThreshold: 3,
+    });
   } catch (err) {
     console.log('An error occurred when sending alerts', err);
     // Handle the error (retry, notify user, etc.)
