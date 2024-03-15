@@ -46,6 +46,10 @@ export async function sendAlerts({
       continue;
     }
 
+    if (existingAlert.sent) {
+      continue;
+    }
+
     const notifications = await db.getByNotificationType(notificationType);
     for (const { chatId } of notifications) {
       try {
