@@ -283,4 +283,17 @@ export class Database {
       });
     });
   }
+
+  deleteAllAlerts(): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      this.db.run('DELETE FROM alerts', (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(true);
+      });
+    });
+  }
 }
