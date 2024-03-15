@@ -31,6 +31,7 @@ export class Database {
         id TEXT PRIMARY KEY NOT NULL,
         timestamp INTEGER NOT NULL,
         count INTEGER DEFAULT 1
+        sent BOOLEAN DEFAULT FALSE
       );
     `;
 
@@ -263,6 +264,25 @@ export class Database {
       `;
 
       this.db.run(update, [id], (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(true);
+      });
+    });
+  }
+
+  async sentAlert(id: string, timestamp: number): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      const update = `
+        UPDATE alerts
+        SET sent = TRUE, timestamp = ?
+        WHERE id = ?
+      `;
+
+      this.db.run(update, [timestamp, id], (err) => {
         if (err) {
           reject(err);
           return;

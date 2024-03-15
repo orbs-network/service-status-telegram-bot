@@ -41,7 +41,7 @@ export async function sendAlerts({
     }
 
     const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
-    if (diff >= 1) {
+    if (existingAlert.sent && diff >= 1) {
       await db.deleteAlert(existingAlert.id);
       continue;
     }
@@ -58,5 +58,7 @@ export async function sendAlerts({
         // Handle the error (retry, notify user, etc.)
       }
     }
+
+    db.sentAlert(existingAlert.id, alert.timestamp);
   }
 }

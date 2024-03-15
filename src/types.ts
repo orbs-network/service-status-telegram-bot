@@ -82,4 +82,5 @@ export type AlertDb = {
   id: string;
   timestamp: number;
   count: number;
+  sent: boolean;
 };
