@@ -336,7 +336,7 @@ bot.telegram.setMyCommands([
 bot.launch();
 dailyReportScheduler.start();
 alertScheduler.start();
-evmAlertScheduler.start();
+// evmAlertScheduler.start();
 
 console.log('Orbs Status Bot is up and running!');
 
