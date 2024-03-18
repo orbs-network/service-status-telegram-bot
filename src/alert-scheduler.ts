@@ -31,18 +31,18 @@ export async function sendAlerts({
       continue;
     }
 
+    const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
+    if (existingAlert.sent && diff >= 1) {
+      await db.deleteAlert(existingAlert.id);
+      continue;
+    }
+
     if (existingAlert.count < alertThreshold - 1) {
       try {
         await db.appendAlertCount(existingAlert.id);
       } catch (err) {
         console.error('An error occurred when appending alert count', err);
       }
-      continue;
-    }
-
-    const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
-    if (existingAlert.sent && diff >= 1) {
-      await db.deleteAlert(existingAlert.id);
       continue;
     }
 
