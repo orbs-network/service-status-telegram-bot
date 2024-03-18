@@ -51,7 +51,6 @@ export class Perps {
       const onChainValue = totalPartyBUnPnl + partyBAllocatedBalance + erc20Balance;
 
       const tableOutput = [
-        ['Metric', 'Value'],
         ['Trades', trades],
         ['Users', users],
         ['Volume', dollar.format(volume)],
