@@ -5,12 +5,12 @@ import { config } from '../config';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 const evmNodes = [
-  { url: 'http://107.6.163.146:3000/', name: 'Ethereum' },
+  // { url: 'http://107.6.163.146:3000/', name: 'Ethereum' },
   { url: 'http://198.20.99.86:3000/', name: 'Bsc' },
   { url: 'http://198.20.96.246:3000/', name: 'Polygon' },
   { url: 'http://198.20.104.2:3000/', name: 'Fantom' },
-  { url: 'http://107.6.181.166:3000/', name: 'Avalanche' },
-  { url: 'http://107.6.176.54:3000/', name: 'Arbitrum' },
+  // { url: 'http://107.6.181.166:3000/', name: 'Avalanche' },
+  // { url: 'http://107.6.176.54:3000/', name: 'Arbitrum' },
 ];
 
 export class EvmNodes {
