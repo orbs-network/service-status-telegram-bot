@@ -1,6 +1,6 @@
 import { format, subDays } from 'date-fns';
 
-export const getQuery = () => {
+export const getQuery = (env: string) => {
   return JSON.stringify({
     aggs: {
       '0': {
@@ -404,7 +404,7 @@ export const getQuery = () => {
               should: [
                 {
                   match: {
-                    environment: 'staging',
+                    environment: env,
                   },
                 },
               ],
