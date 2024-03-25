@@ -61,7 +61,13 @@ export class WalletManager {
       const result = await axios.get<WalletManagerResponse>(WalletManagerEndpoint);
 
       if (!result.data.networks) {
-        throw new Error('No data. Something wrong with /health endpoint');
+        alerts.push({
+          notificationType: NotificationType.WalletManagerAlerts,
+          alertType: WalletManagerAlert.NetworkDown,
+          name: 'Wallet Manager',
+          timestamp: result.data.timestamp,
+          message: `🚨 *WALLET MANAGER DOWN* 🚨\n\n/health endpoint not responding!`,
+        });
       }
 
       Object.entries(result.data.networks).forEach(([name, network]) => {
