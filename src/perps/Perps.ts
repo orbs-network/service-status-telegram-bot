@@ -14,7 +14,7 @@ export class Perps {
     let output = `📊 *${NotificationTypeNames[NotificationType.PerpsDailyReport]}* - ${format(
       subDays(new Date(), 1),
       'dd/MM/yyyy'
-    )}\n\n`;
+    )}`;
 
     const envs = ['prod', 'staging'];
 
