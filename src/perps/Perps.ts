@@ -16,7 +16,7 @@ export class Perps {
       'dd/MM/yyyy'
     )}`;
 
-    const envs = ['prod', 'staging'];
+    const envs = ['staging', 'prod'];
 
     for (const env of envs) {
       try {
