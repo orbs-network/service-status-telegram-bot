@@ -68,8 +68,7 @@ export class Perps {
           ['Binance uPnL', dollar.format(brokerUpnl)],
         ];
 
-        output += `\n*${env.toUpperCase()}*\n\n`;
-
+        output += `\n\n*${env.toUpperCase()}*\n`;
         output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
       } catch (err) {
         console.error('Error running Perps report', err);
