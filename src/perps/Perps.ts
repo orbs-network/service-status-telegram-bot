@@ -1,13 +1,13 @@
 import { table } from 'table';
 import { config } from '../config';
 import { getQuery } from './query';
-import { ElasticsearchResponse, PairExposureComparison } from './types';
+import { ElasticsearchResponse, PairExposureComparison, PerpsAlert } from './types';
 import { dollar } from '../utils';
 import { format, subDays } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-hedger*/_search';
-const hedgerEndpoint = 'http://ec2-52-58-216-28.eu-central-1.compute.amazonaws.com:3001';
+const hedgerEndpoint = 'http://ec2-52-58-216-28.eu-central-1.compute.amazonaws.com';
 
 export class Perps {
   static async report() {
@@ -74,30 +74,43 @@ export class Perps {
 
   static async alerts() {
     const alerts: Alert[] = [];
-    try {
-      const resp = await fetch(`${hedgerEndpoint}/exposure-comparison`);
-      if (resp.status !== 200) {
-        throw new Error('Error fetching hedger exposure');
-      }
 
-      const data = (await resp.json()) as PairExposureComparison[];
+    const ports = [3000, 3001];
 
-      data.forEach((d) => {
-        if (d.quantityDelta > 0) {
-          alerts.push({
-            notificationType: NotificationType.PerpsExposureAlerts,
-            alertType: 'PerpsExposure',
-            name: d.symbol,
-            timestamp: new Date().getTime(),
-            message: `🚨 *${NotificationTypeNames[NotificationType.PerpsExposureAlerts]}* 🚨\n\n*${
-              d.symbol
-            }*: ${dollar.format(d.quantityDelta * d.markPrice)}`,
-          });
+    for (const port of ports) {
+      try {
+        const resp = await fetch(`${hedgerEndpoint}:${port}/exposure-comparison`);
+        if (resp.status !== 200) {
+          throw new Error('Error fetching hedger exposure');
         }
-      });
-    } catch (err) {
-      console.error('Error running Perps alerts', err);
+
+        const data = (await resp.json()) as PairExposureComparison[];
+
+        data.forEach((d) => {
+          if (d.quantityDelta > 0) {
+            alerts.push({
+              notificationType: NotificationType.PerpsExposureAlerts,
+              alertType: PerpsAlert.PerpsExposure,
+              name: d.symbol,
+              timestamp: new Date().getTime(),
+              message: `🚨 *${NotificationTypeNames[NotificationType.PerpsExposureAlerts]}* [${
+                port === 3000 ? 'PROD' : 'STAGING'
+              }]🚨\n\n*${d.symbol}*: ${dollar.format(d.quantityDelta * d.markPrice)}`,
+            });
+          }
+        });
+      } catch (err) {
+        console.error('Error getting Perps Exposure alerts', err);
+        alerts.push({
+          notificationType: NotificationType.PerpsExposureAlerts,
+          alertType: PerpsAlert.PerpsApiDown,
+          name: 'Perps Analytics Api Down',
+          timestamp: new Date().getTime(),
+          message: `🚨 *Perps Analytics Api Down* [${port === 3000 ? 'PROD' : 'STAGING'}]🚨`,
+        });
+      }
     }
+
     return alerts;
   }
 }

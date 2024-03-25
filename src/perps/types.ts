@@ -1,3 +1,8 @@
+export enum PerpsAlert {
+  PerpsExposure = 'PerpsExposure',
+  PerpsApiDown = 'PerpsApiDown',
+}
+
 export interface ElasticsearchResponse {
   took: number;
   timed_out: boolean;
