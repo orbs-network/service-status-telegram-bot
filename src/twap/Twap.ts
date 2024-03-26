@@ -76,7 +76,7 @@ export class Twap {
     try {
       const takers = await Twap.loadBackupTakers();
       const tableOutput = [
-        ['', 'Bids', 'Fills', 'Status'],
+        ['', 'Bids', 'Fills', ''],
         ...takers.map((taker) => {
           if (taker.status !== 'OK') {
             errors += `- *${taker.name}*: ${taker.status}\n`;

@@ -45,7 +45,6 @@ export class DefiNotifications {
     try {
       const statuses = await DefiNotifications.loadStatuses();
       const tableOutput = [
-        ['', 'Status'],
         ...statuses.map((status) => {
           if (status.status !== 'OK') {
             errors += `- *${status.name}*: ${status.status}\n`;

@@ -63,7 +63,7 @@ export class LiquidityHub {
     try {
       const takers = await LiquidityHub.loadBackupTakers();
       const tableOutput = [
-        ['', 'Bids', 'Status'],
+        ['', 'Bids', ''],
         ...takers.map((taker) => {
           if (taker.status !== 'OK') {
             errors += `- *${taker.name}*: ${taker.status}\n`;

@@ -47,7 +47,6 @@ export class EvmNodes {
     try {
       const nodes = await EvmNodes.loadEvmNodes();
       const tableOutput = [
-        ['', 'Status'],
         ...nodes.map((node) => {
           if (node.status !== 'OK') {
             errors += `- *${node.name}*: ${node.status}\n`;
