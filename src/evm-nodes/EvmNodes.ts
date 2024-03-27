@@ -97,22 +97,22 @@ export class EvmNodes {
               node.network
             }*: ${node.status}`,
           });
+        }
 
-          const freeDiskSpaceTB = node.freeDiskSpace / 1000000000;
+        const freeDiskSpaceTB = node.freeDiskSpace / 1000000000;
 
-          if (freeDiskSpaceTB < diskSpaceThresholdsTB[node.network]) {
-            alerts.push({
-              notificationType: NotificationType.EvmNodesAlerts,
-              alertType: EvmNodeAlert.LowDiskSpace,
-              name: node.network,
-              timestamp: new Date().getTime(),
-              message: `🚨 *${NotificationTypeNames[NotificationType.EvmNodesAlerts]}* 🚨\n\n*${
-                node.network
-              }*: Low disk space! ${freeDiskSpaceTB.toFixed(2)}TB is less than minimum of ${
-                diskSpaceThresholdsTB[node.network]
-              }TB.`,
-            });
-          }
+        if (freeDiskSpaceTB < diskSpaceThresholdsTB[node.network]) {
+          alerts.push({
+            notificationType: NotificationType.EvmNodesAlerts,
+            alertType: EvmNodeAlert.LowDiskSpace,
+            name: node.network,
+            timestamp: new Date().getTime(),
+            message: `🚨 *${NotificationTypeNames[NotificationType.EvmNodesAlerts]}* 🚨\n\n*${
+              node.network
+            }*: Low disk space! ${freeDiskSpaceTB.toFixed(2)}TB is less than minimum of ${
+              diskSpaceThresholdsTB[node.network]
+            }TB.`,
+          });
         }
       });
     } catch (err) {
