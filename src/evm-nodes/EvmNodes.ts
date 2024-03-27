@@ -108,7 +108,7 @@ export class EvmNodes {
               timestamp: new Date().getTime(),
               message: `🚨 *${NotificationTypeNames[NotificationType.EvmNodesAlerts]}* 🚨\n\n*${
                 node.network
-              }*: Low disk space! ${freeDiskSpaceTB}TB is less than minimum of ${
+              }*: Low disk space! ${freeDiskSpaceTB.toFixed(2)}TB is less than minimum of ${
                 diskSpaceThresholdsTB[node.network]
               }TB.`,
             });
