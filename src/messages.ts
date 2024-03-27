@@ -71,6 +71,8 @@ export async function subscribe(ctx: Context, db: Database, fromId: number) {
           ),
         ]);
 
+      buttons.push([Markup.button.callback('⬅ Back', 'admin')]);
+
       await ctx.reply('Thanks for adding me to this group. Subscribe to the following:', {
         parse_mode: 'Markdown',
         reply_markup: Markup.inlineKeyboard(buttons).reply_markup,
