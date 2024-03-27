@@ -135,8 +135,6 @@ bot.command('admin', async (ctx) => {
       return;
     }
 
-    ctx.deleteMessage();
-
     const subscriptions = await db.getByChatId(ctx.chat.id);
 
     const buttons = [];
