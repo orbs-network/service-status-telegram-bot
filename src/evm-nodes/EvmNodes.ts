@@ -6,12 +6,18 @@ import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 const evmNodes = [
   // { url: 'http://107.6.163.146:3000/', name: 'Ethereum' },
-  { url: 'http://198.20.99.86:3000/', name: 'Bsc' },
-  { url: 'http://198.20.96.246:3000/', name: 'Polygon' },
-  { url: 'http://198.20.104.2:3000/', name: 'Fantom' },
+  { url: 'http://198.20.99.86:3000/', network: 'Bsc' },
+  { url: 'http://198.20.96.246:3000/', network: 'Polygon' },
+  { url: 'http://198.20.104.2:3000/', network: 'Fantom' },
   // { url: 'http://107.6.181.166:3000/', name: 'Avalanche' },
   // { url: 'http://107.6.176.54:3000/', name: 'Arbitrum' },
 ];
+
+const diskSpaceThresholdsTB: Record<string, number> = {
+  bsc: 2,
+  polygon: 3,
+  fantom: 1,
+};
 
 export class EvmNodes {
   static async loadEvmNodes() {
@@ -23,10 +29,21 @@ export class EvmNodes {
           const response = await fetch(node.url);
 
           const data = (await response.json()) as EvmNodeStatus;
-          return { ...data, name: node.name };
+          return data;
         } catch (err) {
           console.error('Error loading EVM nodes', err);
-          return { name: node.name, status: 'ERROR - fetching node status' };
+          return {
+            network: node.network,
+            status: 'ERROR - fetching node status',
+            lastBlockNumber: 0,
+            timeSinceLastBlock: 0,
+            timeSinceUpgrade: 0,
+            freeDiskSpace: 0,
+            freeMemory: 0,
+            cpuUsage: 0,
+            uptime: 0,
+            timestamp: Date.now().toLocaleString(),
+          };
         }
       })
     );
@@ -49,9 +66,9 @@ export class EvmNodes {
       const tableOutput = [
         ...nodes.map((node) => {
           if (node.status !== 'OK') {
-            errors += `- *${node.name}*: ${node.status}\n`;
+            errors += `- *${node.network}*: ${node.status}\n`;
           }
-          return [truncate(node.name, 20), node.status === 'OK' ? '✅' : '❌'];
+          return [truncate(node.network, 20), node.status === 'OK' ? '✅' : '❌'];
         }),
       ];
       output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
@@ -74,12 +91,28 @@ export class EvmNodes {
           alerts.push({
             notificationType: NotificationType.EvmNodesAlerts,
             alertType: EvmNodeAlert.NodeDown,
-            name: node.name,
+            name: node.network,
             timestamp: new Date().getTime(),
             message: `🚨 *${NotificationTypeNames[NotificationType.EvmNodesAlerts]}* 🚨\n\n*${
-              node.name
+              node.network
             }*: ${node.status}`,
           });
+
+          const freeDiskSpaceTB = node.freeDiskSpace / 1000000000;
+
+          if (freeDiskSpaceTB < diskSpaceThresholdsTB[node.network]) {
+            alerts.push({
+              notificationType: NotificationType.EvmNodesAlerts,
+              alertType: EvmNodeAlert.LowDiskSpace,
+              name: node.network,
+              timestamp: new Date().getTime(),
+              message: `🚨 *${NotificationTypeNames[NotificationType.EvmNodesAlerts]}* 🚨\n\n*${
+                node.network
+              }*: Low disk space! ${freeDiskSpaceTB}TB is less than minimum of ${
+                diskSpaceThresholdsTB[node.network]
+              }TB.`,
+            });
+          }
         }
       });
     } catch (err) {
