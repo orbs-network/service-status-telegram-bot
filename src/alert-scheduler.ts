@@ -1,5 +1,5 @@
 import { differenceInHours } from 'date-fns';
-import { Alert, NotificationType, NotificationTypeUrls } from './types';
+import { Alert, NotificationType, NotificationTypeButtons } from './types';
 import { Context, Markup, Telegraf } from 'telegraf';
 import { Database } from './db';
 import { Update } from 'telegraf/types';
@@ -21,7 +21,9 @@ export async function sendAlerts({
   buttonText,
   alertThreshold,
 }: SendAlertsParams) {
-  const button = Markup.button.url(buttonText, NotificationTypeUrls[notificationType]);
+  const button = NotificationTypeButtons[notificationType].map((b) =>
+    Markup.button.url(b.text, b.url)
+  );
 
   for (const alert of alerts) {
     const existingAlert = await db.getAlert(alert);

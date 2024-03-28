@@ -5,7 +5,7 @@ import { Database } from './db';
 import { CronJob } from 'cron';
 import { wait } from './utils';
 import { getAlerts, getDailyReport, subscribe } from './messages';
-import { NotificationType, NotificationTypeNames, NotificationTypeUrls } from './types';
+import { NotificationType, NotificationTypeNames, NotificationTypeButtons } from './types';
 import { sendAlerts } from './alert-scheduler';
 
 if (!config.BotToken) {
@@ -194,7 +194,9 @@ bot.action(/^report:/g, async (ctx) => {
       return;
     }
 
-    const button = Markup.button.url('🔗 View more', NotificationTypeUrls[notificationType]);
+    const button = NotificationTypeButtons[notificationType].map((b) =>
+      Markup.button.url(b.text, b.url)
+    );
 
     ctx.reply(report, {
       parse_mode: 'Markdown',
@@ -262,7 +264,9 @@ const dailyReportScheduler = new CronJob('0 0 7 * * *', async () => {
         continue;
       }
 
-      const button = Markup.button.url('🔗 View more', NotificationTypeUrls[notificationType]);
+      const button = NotificationTypeButtons[notificationType].map((b) =>
+        Markup.button.url(b.text, b.url)
+      );
 
       await bot.telegram.sendMessage(chatId, message, {
         parse_mode: 'Markdown',
@@ -276,14 +280,23 @@ const dailyReportScheduler = new CronJob('0 0 7 * * *', async () => {
   }
 });
 
+function getAlertThreshold(notificationType: NotificationType) {
+  switch (notificationType) {
+    case NotificationType.EvmNodesAlerts:
+      return 6;
+    case NotificationType.PerpsExposureAlerts:
+      return 3;
+    default:
+      return 2;
+  }
+}
+
 // every 30 seconds
 const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   // Your post_info_proposals_daily logic here
   console.log('Running alertScheduler...');
 
-  const notificationTypes = Object.values(NotificationType).filter(
-    (n) => n !== NotificationType.EvmNodesAlerts
-  );
+  const notificationTypes = Object.values(NotificationType);
 
   for (const notificationType of notificationTypes) {
     try {
@@ -295,7 +308,7 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
         bot,
         alerts,
         buttonText: '🔗 View more',
-        alertThreshold: 2,
+        alertThreshold: getAlertThreshold(notificationType),
       });
     } catch (err) {
       console.log('An error occurred when sending alerts', err);
@@ -304,39 +317,9 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   }
 });
 
-// every 1 minute
-const evmAlertScheduler = new CronJob('*/1 * * * *', async () => {
-  // Your post_info_proposals_daily logic here
-  console.log('Running evmAlertScheduler...');
-
-  try {
-    const alerts = await getAlerts(NotificationType.EvmNodesAlerts);
-
-    await sendAlerts({
-      db,
-      notificationType: NotificationType.EvmNodesAlerts,
-      bot,
-      alerts,
-      buttonText: '🔗 Open Status Page',
-      alertThreshold: 3,
-    });
-  } catch (err) {
-    console.log('An error occurred when sending alerts', err);
-    // Handle the error (retry, notify user, etc.)
-  }
-});
-
-bot.telegram.setMyCommands([
-  {
-    command: 'admin',
-    description: 'Manage alerts and status updates',
-  },
-]);
-
 bot.launch();
 dailyReportScheduler.start();
 alertScheduler.start();
-evmAlertScheduler.start();
 
 console.log('Orbs Status Bot is up and running!');
 

@@ -28,22 +28,57 @@ export const NotificationTypeNames = {
   [NotificationType.PerpsExposureAlerts]: 'Perps Exposure Alerts',
 };
 
-export const NotificationTypeUrls = {
-  [NotificationType.WalletManager]: 'https://services-healthpage.orbs.network/#/wallets-manager',
-  [NotificationType.WalletManagerAlerts]:
-    'https://services-healthpage.orbs.network/#/wallets-manager',
-  [NotificationType.Twap]: 'https://services-healthpage.orbs.network/#/twap',
-  [NotificationType.TwapAlerts]: 'https://services-healthpage.orbs.network/#/twap',
-  [NotificationType.LiquidityHub]: 'https://services-healthpage.orbs.network/#/clob',
-  [NotificationType.LiquidityHubAlerts]: 'https://services-healthpage.orbs.network/#/clob',
-  [NotificationType.DefiNotifications]:
-    'https://services-healthpage.orbs.network/#/defi-notifications',
-  [NotificationType.DefiNotificationsAlerts]:
-    'https://services-healthpage.orbs.network/#/defi-notifications',
-  [NotificationType.EvmNodesStatus]: 'https://services-healthpage.orbs.network/#/evm-nodes',
-  [NotificationType.EvmNodesAlerts]: 'https://services-healthpage.orbs.network/#/evm-nodes',
-  [NotificationType.PerpsDailyReport]: 'https://staging-perps.orbs.network',
-  [NotificationType.PerpsExposureAlerts]: 'https://staging-perps.orbs.network/exposure',
+export const NotificationTypeButtons = {
+  [NotificationType.WalletManager]: [
+    {
+      text: '🔗 Open status page',
+      url: 'https://services-healthpage.orbs.network/#/wallets-manager',
+    },
+  ],
+  [NotificationType.WalletManagerAlerts]: [
+    {
+      text: '🔗 Open status page',
+      url: 'https://services-healthpage.orbs.network/#/wallets-manager',
+    },
+  ],
+  [NotificationType.Twap]: [
+    { text: '🔗 Open status page', url: 'https://services-healthpage.orbs.network/#/twap' },
+  ],
+  [NotificationType.TwapAlerts]: [
+    { text: '🔗 Open status page', url: 'https://services-healthpage.orbs.network/#/twap' },
+  ],
+  [NotificationType.LiquidityHub]: [
+    { text: '🔗 Open status page', url: 'https://services-healthpage.orbs.network/#/clob' },
+  ],
+  [NotificationType.LiquidityHubAlerts]: [
+    { text: '🔗 Open status page', url: 'https://services-healthpage.orbs.network/#/clob' },
+  ],
+  [NotificationType.DefiNotifications]: [
+    {
+      text: '🔗 Open status page',
+      url: 'https://services-healthpage.orbs.network/#/defi-notifications',
+    },
+  ],
+  [NotificationType.DefiNotificationsAlerts]: [
+    {
+      text: '🔗 Open status page',
+      url: 'https://services-healthpage.orbs.network/#/defi-notifications',
+    },
+  ],
+  [NotificationType.EvmNodesStatus]: [
+    { text: '🔗 Open status page', url: 'https://services-healthpage.orbs.network/#/evm-nodes' },
+  ],
+  [NotificationType.EvmNodesAlerts]: [
+    { text: '🔗 Open status page', url: 'https://services-healthpage.orbs.network/#/evm-nodes' },
+  ],
+  [NotificationType.PerpsDailyReport]: [
+    { text: '🔗 View STAGING', url: 'https://staging-perps.orbs.network' },
+    { text: '🔗 View PROD', url: 'https://prod-perps.orbs.network' },
+  ],
+  [NotificationType.PerpsExposureAlerts]: [
+    { text: '🔗 See on STAGING', url: 'https://staging-perps.orbs.network/exposure' },
+    { text: '🔗 See on PROD', url: 'https://prod-perps.orbs.network/exposure' },
+  ],
 };
 
 export const AlertTypes = [
