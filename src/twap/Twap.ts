@@ -11,7 +11,7 @@ export class Twap {
       const backupTakers = [
         'https://twap-taker-1.herokuapp.com/health',
         'https://twap-taker-2.herokuapp.com/health',
-        'http://107.6.165.78:8080/health',
+        'https://twap-taker-3.herokuapp.com/health',
       ];
 
       const results = await Promise.allSettled(backupTakers.map((url) => fetch(url)));
