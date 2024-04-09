@@ -1,4 +1,4 @@
-import { differenceInHours } from 'date-fns';
+import { differenceInMinutes } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeButtons } from './types';
 import { Context, Markup, Telegraf } from 'telegraf';
 import { Database } from './db';
@@ -33,13 +33,13 @@ export async function sendAlerts({
       continue;
     }
 
-    const diff = differenceInHours(existingAlert.timestamp, alert.timestamp);
-    if (existingAlert.sent && diff >= 1) {
+    const diff = differenceInMinutes(existingAlert.timestamp, alert.timestamp);
+    if (existingAlert.sent && diff > 60) {
       await db.deleteAlert(existingAlert.id);
       continue;
     }
 
-    if (existingAlert.count < alertThreshold - 1) {
+    if (existingAlert.count < alertThreshold) {
       try {
         await db.appendAlertCount(existingAlert.id);
       } catch (err) {
