@@ -32,7 +32,7 @@ export async function sendAlerts({
     }
 
     const diff = differenceInMinutes(existingAlert.timestamp, alert.timestamp);
-    if (existingAlert.sent && diff > 60) {
+    if (diff >= 60) {
       await db.deleteAlert(existingAlert.id);
       continue;
     }
