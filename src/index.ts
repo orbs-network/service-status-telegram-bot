@@ -283,11 +283,10 @@ const dailyReportScheduler = new CronJob('0 0 7 * * *', async () => {
 function getAlertThreshold(notificationType: NotificationType) {
   switch (notificationType) {
     case NotificationType.EvmNodesAlerts:
-      return 6;
     case NotificationType.PerpsExposureAlerts:
-      return 3;
+      return 6;
     default:
-      return 2;
+      return 3;
   }
 }
 
