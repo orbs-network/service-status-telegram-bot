@@ -9,7 +9,6 @@ type SendAlertsParams = {
   notificationType: NotificationType;
   bot: Telegraf<Context<Update>>;
   alerts: Alert[];
-  buttonText: string;
   alertThreshold: number;
 };
 
@@ -18,7 +17,6 @@ export async function sendAlerts({
   notificationType,
   bot,
   alerts,
-  buttonText,
   alertThreshold,
 }: SendAlertsParams) {
   const button = NotificationTypeButtons[notificationType].map((b) =>

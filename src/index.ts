@@ -306,7 +306,6 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
         notificationType,
         bot,
         alerts,
-        buttonText: '🔗 View more',
         alertThreshold: getAlertThreshold(notificationType),
       });
     } catch (err) {
