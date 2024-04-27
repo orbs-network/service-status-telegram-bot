@@ -10,7 +10,8 @@ export enum NotificationType {
   EvmNodesStatus = 'EvmNodesStatus',
   EvmNodesAlerts = 'EvmNodesAlerts',
   PerpsDailyReport = 'PerpsDailyReport',
-  PerpsExposureAlerts = 'PerpsExposureAlerts',
+  PerpsExposureAlertsProd = 'PerpsExposureAlertsProd',
+  PerpsExposureAlertsStaging = 'PerpsExposureAlertsStaging',
 }
 
 export const NotificationTypeNames = {
@@ -25,7 +26,8 @@ export const NotificationTypeNames = {
   [NotificationType.EvmNodesStatus]: 'EVM Nodes Status',
   [NotificationType.EvmNodesAlerts]: 'EVM Nodes Alerts',
   [NotificationType.PerpsDailyReport]: 'Perps Daily Report',
-  [NotificationType.PerpsExposureAlerts]: 'Perps Exposure Alerts',
+  [NotificationType.PerpsExposureAlertsProd]: 'Perps Exposure Alerts [PROD]',
+  [NotificationType.PerpsExposureAlertsStaging]: 'Perps Exposure Alerts [STAGING]',
 };
 
 export const NotificationTypeButtons = {
@@ -75,9 +77,11 @@ export const NotificationTypeButtons = {
     { text: '🔗 View STAGING', url: 'https://staging-perps.orbs.network' },
     { text: '🔗 View PROD', url: 'https://prod-perps.orbs.network' },
   ],
-  [NotificationType.PerpsExposureAlerts]: [
-    { text: '🔗 See on STAGING', url: 'https://staging-perps.orbs.network/exposure' },
+  [NotificationType.PerpsExposureAlertsProd]: [
     { text: '🔗 See on PROD', url: 'https://prod-perps.orbs.network/exposure' },
+  ],
+  [NotificationType.PerpsExposureAlertsStaging]: [
+    { text: '🔗 See on STAGING', url: 'https://staging-perps.orbs.network/exposure' },
   ],
 };
 
@@ -87,7 +91,8 @@ export const AlertTypes = [
   NotificationType.LiquidityHubAlerts,
   NotificationType.DefiNotificationsAlerts,
   NotificationType.EvmNodesAlerts,
-  NotificationType.PerpsExposureAlerts,
+  NotificationType.PerpsExposureAlertsProd,
+  NotificationType.PerpsExposureAlertsStaging,
 ];
 
 export const StatusTypes = [

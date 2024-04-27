@@ -7,7 +7,9 @@ import { format, subDays } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
 const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-hedger*/_search';
-const hedgerEndpoint = 'http://ec2-52-58-216-28.eu-central-1.compute.amazonaws.com';
+const stagingEndpoint =
+  'http://nginx-staging-lb-1142917146.ap-northeast-1.elb.amazonaws.com/analytics/v1';
+const prodEndpoint = 'http://nginx-prod-lb-501211187.ap-northeast-1.elb.amazonaws.com/analytics/v1';
 
 export class Perps {
   static async report() {
@@ -82,11 +84,16 @@ export class Perps {
   static async alerts() {
     const alerts: Alert[] = [];
 
-    const ports = [3000, 3001];
+    const endpoints = [stagingEndpoint, prodEndpoint];
 
-    for (const port of ports) {
+    for (const url of endpoints) {
+      const isProd = url === prodEndpoint;
+      const notificationType = isProd
+        ? NotificationType.PerpsExposureAlertsProd
+        : NotificationType.PerpsExposureAlertsStaging;
+
       try {
-        const resp = await fetch(`${hedgerEndpoint}:${port}/exposure-comparison`);
+        const resp = await fetch(`${url}/exposure-comparison`);
         if (resp.status !== 200) {
           throw new Error('Error fetching hedger exposure');
         }
@@ -96,24 +103,24 @@ export class Perps {
         data.forEach((d) => {
           if (d.quantityDelta > 0) {
             alerts.push({
-              notificationType: NotificationType.PerpsExposureAlerts,
+              notificationType,
               alertType: PerpsAlert.PerpsExposure,
               name: d.symbol,
               timestamp: new Date().getTime(),
-              message: `🚨 *${NotificationTypeNames[NotificationType.PerpsExposureAlerts]}* [${
-                port === 3000 ? 'PROD' : 'STAGING'
-              }]🚨\n\n*${d.symbol}*: ${dollar.format(d.quantityDelta * d.markPrice)}`,
+              message: `🚨 *${NotificationTypeNames[notificationType]}* 🚨\n\n*${
+                d.symbol
+              }*: ${dollar.format(d.quantityDelta * d.markPrice)}`,
             });
           }
         });
       } catch (err) {
         console.error('Error getting Perps Exposure alerts', err);
         alerts.push({
-          notificationType: NotificationType.PerpsExposureAlerts,
+          notificationType,
           alertType: PerpsAlert.PerpsApiDown,
           name: 'Perps Analytics Api Down',
           timestamp: new Date().getTime(),
-          message: `🚨 *Perps Analytics Api Down* [${port === 3000 ? 'PROD' : 'STAGING'}]🚨`,
+          message: `🚨 *Perps Analytics Api Down* [${url === prodEndpoint ? 'PROD' : 'STAGING'}]🚨`,
         });
       }
     }
