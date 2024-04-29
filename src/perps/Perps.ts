@@ -68,7 +68,12 @@ export class Perps {
         ];
 
         output += `\n\n*${env.toUpperCase()}*\n`;
-        output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
+        output += `\`\`\`\n${table(tableOutput, {
+          ...config.AsciiTableOpts,
+          columns: {
+            1: { width: 10 },
+          },
+        })}\n\`\`\``;
       } catch (err) {
         console.error('Error running Perps report', err);
         output += '\nError running Perps report';
