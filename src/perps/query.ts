@@ -419,7 +419,7 @@ export const getQuery = (env: string) => {
           },
           {
             range: {
-              'cloudWatchLogEvents.timestamp': {
+              timestamp: {
                 format: 'dd/MM/yyyy',
                 gte: format(subDays(new Date(), 1), 'dd/MM/yyyy'),
                 lte: format(new Date(), 'dd/MM/yyyy'),
