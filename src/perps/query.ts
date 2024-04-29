@@ -10,15 +10,6 @@ export const getQuery = (env: string) => {
           time_zone: 'Europe/London',
         },
         aggs: {
-          gasPaid: {
-            sum: {
-              script: {
-                source:
-                  "if (doc['gasPaid.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['gasPaid.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
-                lang: 'painless',
-              },
-            },
-          },
           trades: {
             filter: {
               bool: {
@@ -118,7 +109,6 @@ export const getQuery = (env: string) => {
               },
             },
           },
-
           erc20Balance: {
             filter: {
               bool: {
@@ -211,7 +201,6 @@ export const getQuery = (env: string) => {
               },
             },
           },
-
           marginBalance: {
             filter: {
               bool: {
@@ -258,7 +247,6 @@ export const getQuery = (env: string) => {
               },
             },
           },
-
           volume: {
             filter: {
               bool: {
@@ -342,6 +330,10 @@ export const getQuery = (env: string) => {
     size: 0,
     fields: [
       {
+        field: 'cloudWatchLogEvents.timestamp',
+        format: 'date_time',
+      },
+      {
         field: 'timestamp',
         format: 'date_time',
       },
@@ -389,6 +381,20 @@ export const getQuery = (env: string) => {
           lang: 'painless',
         },
       },
+      gasBalanceNum: {
+        script: {
+          source:
+            "if (doc['balance.keyword'].size() == 0) { \n    return 0; // or any default value you prefer \n} else { \n    return Double.parseDouble(doc['balance.keyword'].value); // Use Double.parseDouble for floating point numbers \n}",
+          lang: 'painless',
+        },
+      },
+      botAddress: {
+        script: {
+          source:
+            "if (doc['address.keyword'].size() == 0) {\n    return ''\n} else if (doc['symmId.keyword'].size() == 0) { \n    return '56a-' + doc['address.keyword'].value\n} else { \n    return doc['symmId.keyword'].value + '-' + doc['address.keyword'].value\n}",
+          lang: 'painless',
+        },
+      },
     },
     stored_fields: ['*'],
     runtime_mappings: {},
@@ -413,7 +419,7 @@ export const getQuery = (env: string) => {
           },
           {
             range: {
-              timestamp: {
+              'cloudWatchLogEvents.timestamp': {
                 format: 'dd/MM/yyyy',
                 gte: format(subDays(new Date(), 1), 'dd/MM/yyyy'),
                 lte: format(new Date(), 'dd/MM/yyyy'),

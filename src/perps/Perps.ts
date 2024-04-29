@@ -49,10 +49,8 @@ export class Perps {
           data.aggregations[0].buckets[0].partyBAllocatedBalance?.partyBAllocatedBalance.hits
             ?.hits[0].fields.partyBAllocatedBalanceNum[0] || 0;
         const volume = data.aggregations[0].buckets[0].volume?.volume.value || 0;
-        const gasPaid = data.aggregations[0].buckets[0].gasPaid?.value || 0;
         const users = data.aggregations[0].buckets[0].users?.users.value || 0;
         const trades = data.aggregations[0].buckets[0].trades?.doc_count || 0;
-
         const totalFunds = marginBalance + erc20Balance + totalPartyBUnPnl + partyBAllocatedBalance;
         const onChainValue = totalPartyBUnPnl + partyBAllocatedBalance + erc20Balance;
 
@@ -60,13 +58,12 @@ export class Perps {
           ['Trades', trades],
           ['Users', users],
           ['Volume', dollar.format(volume)],
-          ['Gas Paid', `${Number(gasPaid.toFixed(5))} BNB`],
           ['Total Funds', dollar.format(totalFunds)],
-          ['On-chain Value', dollar.format(onChainValue)],
+          ['Chain Value', dollar.format(onChainValue)],
           ['Binance Value', dollar.format(marginBalance)],
-          ['On-chain uPnL', dollar.format(totalPartyBUnPnl)],
-          ['On-chain Alloc.', dollar.format(partyBAllocatedBalance)],
-          ['On-chain Unalloc.', dollar.format(erc20Balance)],
+          ['Chain Alloc.', dollar.format(partyBAllocatedBalance)],
+          ['Chain Unalloc.', dollar.format(erc20Balance)],
+          ['Chain uPnL', dollar.format(totalPartyBUnPnl)],
           ['Binance uPnL', dollar.format(brokerUpnl)],
         ];
 
