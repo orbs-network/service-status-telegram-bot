@@ -6,7 +6,7 @@ import { dollar } from '../utils';
 import { format, subDays } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
 
-const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-hedger*/_search';
+const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-lambda*/_search';
 const stagingEndpoint =
   'http://nginx-staging-lb-1142917146.ap-northeast-1.elb.amazonaws.com/analytics/v1';
 const prodEndpoint = 'http://nginx-prod-lb-501211187.ap-northeast-1.elb.amazonaws.com/analytics/v1';
