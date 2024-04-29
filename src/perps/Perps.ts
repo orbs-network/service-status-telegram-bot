@@ -73,7 +73,7 @@ export class Perps {
         output += `\`\`\`\n${table(tableOutput, {
           ...config.AsciiTableOpts,
           columns: {
-            0: { width: 10 },
+            0: { width: 8, wrapWord: true },
           },
         })}\n\`\`\``;
       } catch (err) {
