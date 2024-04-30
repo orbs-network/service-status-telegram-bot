@@ -7,7 +7,6 @@ export const getQuery = (env: string) => {
         date_histogram: {
           field: 'timestamp',
           calendar_interval: '1d',
-          time_zone: 'Europe/London',
         },
         aggs: {
           trades: {
