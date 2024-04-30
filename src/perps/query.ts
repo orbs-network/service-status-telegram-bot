@@ -420,9 +420,8 @@ export const getQuery = (env: string) => {
           {
             range: {
               timestamp: {
-                format: 'dd/MM/yyyy',
-                gte: format(subDays(new Date(), 1), 'dd/MM/yyyy'),
-                lte: format(new Date(), 'dd/MM/yyyy'),
+                gte: format(subDays(new Date(), 1), 'yyyy-MM-dd'),
+                lte: format(new Date(), 'yyyy-MM-dd'),
               },
             },
           },
