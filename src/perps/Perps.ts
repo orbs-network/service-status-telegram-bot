@@ -103,7 +103,8 @@ export class Perps {
         const data = (await resp.json()) as PairExposureComparison[];
 
         data.forEach((d) => {
-          if (d.quantityDelta > 0) {
+          const exposure = d.quantityDelta * d.markPrice;
+          if (exposure > 0) {
             alerts.push({
               notificationType,
               alertType: PerpsAlert.PerpsExposure,
@@ -111,7 +112,7 @@ export class Perps {
               timestamp: new Date().getTime(),
               message: `🚨 *${NotificationTypeNames[notificationType]}* 🚨\n\n*${
                 d.symbol
-              }*: ${dollar.format(d.quantityDelta * d.markPrice)}`,
+              }*: ${dollar.format(exposure)}`,
             });
           }
         });
