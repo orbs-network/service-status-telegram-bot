@@ -317,5 +317,13 @@ alertScheduler.start();
 
 console.log('Orbs Status Bot is up and running!');
 
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+process.once('SIGINT', () => {
+  dailyReportScheduler.stop();
+  alertScheduler.stop();
+  bot.stop('SIGINT');
+});
+process.once('SIGTERM', () => {
+  dailyReportScheduler.stop();
+  alertScheduler.stop();
+  bot.stop('SIGTERM');
+});
