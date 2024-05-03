@@ -25,12 +25,14 @@ export class Database {
     this.db.run(createNotificationsTable);
 
     const createAlertsTable = `
+      DROP TABLE IF EXISTS alerts;
+
       CREATE TABLE IF NOT EXISTS alerts (
         id TEXT PRIMARY KEY NOT NULL,
         timestamp INTEGER NOT NULL,
         count INTEGER DEFAULT 1,
         sent BOOLEAN DEFAULT FALSE
-      )
+      );
     `;
 
     this.db.run(createAlertsTable);

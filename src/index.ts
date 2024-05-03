@@ -312,8 +312,11 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
 });
 
 bot.launch();
-dailyReportScheduler.start();
-alertScheduler.start();
+
+setTimeout(() => {
+  dailyReportScheduler.start();
+  alertScheduler.start();
+}, 30000);
 
 console.log('Orbs Status Bot is up and running!');
 
