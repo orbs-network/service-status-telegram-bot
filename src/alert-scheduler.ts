@@ -76,6 +76,10 @@ export async function sendAlerts({
       }
     }
     db.sentAlert(existingAlert.id, alert.timestamp);
-    console.log(`Sent alert ${existingAlert.id} to ${notifications.length - errors} chats`);
+    console.log(
+      `Sent alert ${existingAlert.id} to ${notifications.length - errors}/${
+        notifications.length
+      } chats. Had ${errors} errors.`
+    );
   }
 }
