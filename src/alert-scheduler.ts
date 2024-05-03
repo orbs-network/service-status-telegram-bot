@@ -28,14 +28,17 @@ export async function sendAlerts({
 
     if (!existingAlert) {
       await db.insertAlert(alert);
-      console.log('Added new alert to db', alert);
+      console.log('Added new alert to db', JSON.stringify(alert));
       continue;
     }
 
     const diff = differenceInMinutes(existingAlert.timestamp, alert.timestamp);
     if (diff >= 60) {
       await db.deleteAlert(existingAlert.id);
-      console.log('Deleted existing alert from db as it has passed 60mins', existingAlert);
+      console.log(
+        'Deleted existing alert from db as it has passed 60mins',
+        JSON.stringify(existingAlert)
+      );
       continue;
     }
 
@@ -44,7 +47,7 @@ export async function sendAlerts({
         await db.appendAlertCount(existingAlert.id);
         console.log('Append count to alert', existingAlert);
       } catch (err) {
-        console.error('An error occurred when appending alert count', err);
+        console.error('An error occurred when appending alert count', JSON.stringify(err));
       }
       continue;
     }
@@ -54,6 +57,7 @@ export async function sendAlerts({
     }
 
     const notifications = await db.getByNotificationType(notificationType);
+    let errors = 0;
     for (const { chatId } of notifications) {
       try {
         await bot.telegram.sendMessage(chatId, alert.message, {
@@ -65,12 +69,13 @@ export async function sendAlerts({
           `An error occurred when sending alert id: ${existingAlert.id} ${new Date(
             existingAlert.timestamp
           ).toLocaleString()} to chat id: ${chatId}`,
-          err
+          JSON.stringify(err)
         );
+        errors++;
         // Handle the error (retry, notify user, etc.)
       }
     }
     db.sentAlert(existingAlert.id, alert.timestamp);
-    console.log('Sent alert', existingAlert, alert);
+    console.log(`Sent alert ${existingAlert.id} to ${notifications.length - errors} chats`);
   }
 }
