@@ -28,18 +28,21 @@ export async function sendAlerts({
 
     if (!existingAlert) {
       await db.insertAlert(alert);
+      console.log('Added new alert to db', alert);
       continue;
     }
 
     const diff = differenceInMinutes(existingAlert.timestamp, alert.timestamp);
     if (diff >= 60) {
       await db.deleteAlert(existingAlert.id);
+      console.log('Deleted existing alert from db as it has passed 60mins', existingAlert);
       continue;
     }
 
     if (existingAlert.count < alertThreshold) {
       try {
         await db.appendAlertCount(existingAlert.id);
+        console.log('Append count to alert', existingAlert);
       } catch (err) {
         console.error('An error occurred when appending alert count', err);
       }
@@ -58,6 +61,7 @@ export async function sendAlerts({
           reply_markup: Markup.inlineKeyboard([button]).reply_markup,
         });
         db.sentAlert(existingAlert.id, alert.timestamp);
+        console.log('Sent alert', existingAlert, alert);
       } catch (err) {
         console.error(
           `An error occurred when sending alert id: ${existingAlert.id} ${new Date(
