@@ -106,14 +106,13 @@ export class Perps {
 
         data.forEach((d) => {
           if (d.quantityDelta > EPSILON) {
+            const exposure = dollar.format(d.quantityDelta * d.markPrice);
             alerts.push({
               notificationType,
               alertType: PerpsAlert.PerpsExposure,
-              name: d.symbol,
+              name: `${d.symbol}:${exposure}`,
               timestamp: new Date().getTime(),
-              message: `🚨 *${NotificationTypeNames[notificationType]}* 🚨\n\n*${
-                d.symbol
-              }*: ${dollar.format(d.quantityDelta * d.markPrice)}`,
+              message: `🚨 *${NotificationTypeNames[notificationType]}* 🚨\n\n*${d.symbol}*: ${exposure}`,
             });
           }
         });
