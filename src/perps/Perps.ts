@@ -102,8 +102,10 @@ export class Perps {
 
         const data = (await resp.json()) as PairExposureComparison[];
 
+        const EPSILON = 1e-10;
+
         data.forEach((d) => {
-          if (d.quantityDelta > Number.EPSILON) {
+          if (d.quantityDelta > EPSILON) {
             alerts.push({
               notificationType,
               alertType: PerpsAlert.PerpsExposure,
