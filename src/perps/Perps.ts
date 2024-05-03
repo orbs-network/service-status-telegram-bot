@@ -32,8 +32,6 @@ export class Perps {
 
         const data = (await resp.json()) as ElasticsearchResponse;
 
-        console.log('Perps data', data);
-
         const marginBalance =
           data.aggregations[0].buckets[0].marginBalance?.marginBalance.hits?.hits[0].fields
             .marginBalanceNum[0] || 0;

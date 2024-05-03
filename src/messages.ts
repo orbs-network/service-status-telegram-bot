@@ -82,6 +82,6 @@ export async function subscribe(ctx: Context, db: Database, fromId: number) {
       await ctx.reply('You are not an admin. Only admins can subscribe to notifications.');
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }

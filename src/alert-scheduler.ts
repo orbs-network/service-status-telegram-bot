@@ -57,12 +57,16 @@ export async function sendAlerts({
           parse_mode: 'Markdown',
           reply_markup: Markup.inlineKeyboard([button]).reply_markup,
         });
+        db.sentAlert(existingAlert.id, alert.timestamp);
       } catch (err) {
-        console.log('An error occurred when sending alerts', err);
+        console.error(
+          `An error occurred when sending alert id: ${existingAlert.id} ${new Date(
+            existingAlert.timestamp
+          ).toLocaleString()}`,
+          err
+        );
         // Handle the error (retry, notify user, etc.)
       }
     }
-
-    db.sentAlert(existingAlert.id, alert.timestamp);
   }
 }

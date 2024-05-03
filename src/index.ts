@@ -29,7 +29,7 @@ bot.start(async (ctx) => {
       return;
     }
   } catch (err) {
-    console.log('An error occured when executing the start command', err);
+    console.error('An error occured when executing the start command', err);
   }
 });
 
@@ -56,7 +56,7 @@ bot.on('my_chat_member', async (ctx) => {
       // clear by chat id
       await db.deleteByChatId(ctx.chat.id);
     } catch (err) {
-      console.log('An error occured when clearing db', err);
+      console.error('An error occured when clearing db', err);
     }
     return;
   }
@@ -164,7 +164,7 @@ bot.command('admin', async (ctx) => {
       }
     );
   } catch (err) {
-    console.log('An unknown error occured.', err);
+    console.error('An unknown error occured.', err);
   }
 });
 
@@ -251,7 +251,7 @@ const dailyReportScheduler = new CronJob('0 0 7 * * *', async () => {
       }
       dailySnapshot[notificationType] = report;
     } catch (err) {
-      console.log('An error occurred when sending daily report', err);
+      console.error('An error occurred when sending daily report', err);
       // Handle the error (retry, notify user, etc.)
     }
   }
@@ -274,7 +274,7 @@ const dailyReportScheduler = new CronJob('0 0 7 * * *', async () => {
       });
       await wait(1000);
     } catch (err) {
-      console.log('An error occurred when sending daily report', err);
+      console.error('An error occurred when sending daily report', err);
       // Handle the error (retry, notify user, etc.)
     }
   }
@@ -310,7 +310,7 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
         alertThreshold: getAlertThreshold(notificationType),
       });
     } catch (err) {
-      console.log('An error occurred when sending alerts', err);
+      console.error('An error occurred when sending alerts', err);
       // Handle the error (retry, notify user, etc.)
     }
   }
