@@ -299,20 +299,15 @@ const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   const notificationTypes = Object.values(NotificationType);
 
   for (const notificationType of notificationTypes) {
-    try {
-      const alerts = await getAlerts(notificationType);
+    const alerts = await getAlerts(notificationType);
 
-      await sendAlerts({
-        db,
-        notificationType,
-        bot,
-        alerts,
-        alertThreshold: getAlertThreshold(notificationType),
-      });
-    } catch (err) {
-      console.error('An error occurred when sending alerts', err);
-      // Handle the error (retry, notify user, etc.)
-    }
+    await sendAlerts({
+      db,
+      notificationType,
+      bot,
+      alerts,
+      alertThreshold: getAlertThreshold(notificationType),
+    });
   }
 });
 
