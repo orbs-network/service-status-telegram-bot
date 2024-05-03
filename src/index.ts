@@ -294,7 +294,7 @@ function getAlertThreshold(notificationType: NotificationType) {
 // every 30 seconds
 const alertScheduler = new CronJob('*/30 * * * * *', async () => {
   // Your post_info_proposals_daily logic here
-  console.log('Running alertScheduler...');
+  // console.log('Running alertScheduler...');
 
   const notificationTypes = Object.values(NotificationType);
 
