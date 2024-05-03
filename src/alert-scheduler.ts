@@ -60,17 +60,17 @@ export async function sendAlerts({
           parse_mode: 'Markdown',
           reply_markup: Markup.inlineKeyboard([button]).reply_markup,
         });
-        db.sentAlert(existingAlert.id, alert.timestamp);
-        console.log('Sent alert', existingAlert, alert);
       } catch (err) {
         console.error(
           `An error occurred when sending alert id: ${existingAlert.id} ${new Date(
             existingAlert.timestamp
-          ).toLocaleString()}`,
+          ).toLocaleString()} to chat id: ${chatId}`,
           err
         );
         // Handle the error (retry, notify user, etc.)
       }
     }
+    db.sentAlert(existingAlert.id, alert.timestamp);
+    console.log('Sent alert', existingAlert, alert);
   }
 }
