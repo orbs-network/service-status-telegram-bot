@@ -45,7 +45,7 @@ export async function sendAlerts({
     if (existingAlert.count < alertThreshold) {
       try {
         await db.appendAlertCount(existingAlert.id);
-        console.log('Append count to alert', existingAlert);
+        console.log('Append count to alert', JSON.stringify(existingAlert));
       } catch (err) {
         console.error('An error occurred when appending alert count', JSON.stringify(err));
       }
