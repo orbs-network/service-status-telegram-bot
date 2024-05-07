@@ -1,8 +1,9 @@
-import { differenceInMinutes } from 'date-fns';
+import { differenceInMinutes, differenceInSeconds } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeButtons } from './types';
 import { Context, Markup, Telegraf } from 'telegraf';
 import { Database } from './db';
 import { Update } from 'telegraf/types';
+import { ALERT_POLL_TIME_SEC } from '.';
 
 type SendAlertsParams = {
   db: Database;
@@ -24,35 +25,50 @@ export async function sendAlerts({
   );
 
   for (const alert of alerts) {
-    const existingAlert = await db.getAlert(alert);
+    const existingAlertDb = await db.getAlert(alert);
 
-    if (!existingAlert) {
+    if (!existingAlertDb) {
       await db.insertAlert(alert);
       console.log('Added new alert to db', JSON.stringify(alert));
       continue;
     }
 
-    const diff = differenceInMinutes(existingAlert.timestamp, alert.timestamp);
-    if (diff >= 60) {
-      await db.deleteAlert(existingAlert.id);
+    const diffInMins = differenceInMinutes(existingAlertDb.timestamp, alert.timestamp);
+    if (existingAlertDb.sent && diffInMins >= 60) {
+      await db.deleteAlert(existingAlertDb.id);
       console.log(
         'Deleted existing alert from db as it has passed 60mins',
-        JSON.stringify(existingAlert)
+        JSON.stringify(existingAlertDb)
       );
       continue;
     }
 
-    if (existingAlert.count < alertThreshold) {
+    const diffInSeconds = differenceInSeconds(new Date().getTime(), existingAlertDb.timestamp);
+    const thresholdInSeconds = alertThreshold * ALERT_POLL_TIME_SEC;
+    if (
+      !existingAlertDb.sent &&
+      existingAlertDb.count < alertThreshold &&
+      diffInSeconds > thresholdInSeconds
+    ) {
+      await db.deleteAlert(existingAlertDb.id);
+      console.log(
+        `Deleted existing alert from db as it didn't persist for the duration of the threshold`,
+        JSON.stringify(existingAlertDb)
+      );
+      continue;
+    }
+
+    if (existingAlertDb.count < alertThreshold) {
       try {
-        await db.appendAlertCount(existingAlert.id);
-        console.log('Append count to alert', JSON.stringify(existingAlert));
+        await db.appendAlertCount(existingAlertDb.id);
+        console.log('Append count to alert', JSON.stringify(existingAlertDb));
       } catch (err) {
         console.error('An error occurred when appending alert count', JSON.stringify(err));
       }
       continue;
     }
 
-    if (existingAlert.sent) {
+    if (existingAlertDb.sent) {
       continue;
     }
 
@@ -66,8 +82,8 @@ export async function sendAlerts({
         });
       } catch (err) {
         console.error(
-          `An error occurred when sending alert id: ${existingAlert.id} ${new Date(
-            existingAlert.timestamp
+          `An error occurred when sending alert id: ${existingAlertDb.id} ${new Date(
+            existingAlertDb.timestamp
           ).toLocaleString()} to chat id: ${chatId}`,
           JSON.stringify(err)
         );
@@ -75,9 +91,9 @@ export async function sendAlerts({
         // Handle the error (retry, notify user, etc.)
       }
     }
-    db.sentAlert(existingAlert.id, alert.timestamp);
+    db.sentAlert(existingAlertDb.id, alert.timestamp);
     console.log(
-      `Sent alert ${existingAlert.id} to ${notifications.length - errors}/${
+      `Sent alert ${existingAlertDb.id} to ${notifications.length - errors}/${
         notifications.length
       } chats. Had ${errors} errors.`
     );

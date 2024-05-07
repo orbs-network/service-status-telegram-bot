@@ -110,7 +110,7 @@ export class Perps {
             alerts.push({
               notificationType,
               alertType: PerpsAlert.PerpsExposure,
-              name: `${d.symbol}:${exposure}`,
+              name: d.symbol,
               timestamp: new Date().getTime(),
               message: `🚨 *${NotificationTypeNames[notificationType]}* 🚨\n\n*${d.symbol}*: ${exposure}`,
             });

@@ -291,8 +291,9 @@ function getAlertThreshold(notificationType: NotificationType) {
   }
 }
 
+export const ALERT_POLL_TIME_SEC = 30;
 // every 30 seconds
-const alertScheduler = new CronJob('*/30 * * * * *', async () => {
+const alertPolling = new CronJob(`*/${ALERT_POLL_TIME_SEC} * * * * *`, async () => {
   // Your post_info_proposals_daily logic here
   // console.log('Running alertScheduler...');
 
@@ -315,18 +316,18 @@ bot.launch();
 
 setTimeout(() => {
   dailyReportScheduler.start();
-  alertScheduler.start();
+  alertPolling.start();
 }, 30000);
 
 console.log('Orbs Status Bot is up and running!');
 
 process.once('SIGINT', () => {
   dailyReportScheduler.stop();
-  alertScheduler.stop();
+  alertPolling.stop();
   bot.stop('SIGINT');
 });
 process.once('SIGTERM', () => {
   dailyReportScheduler.stop();
-  alertScheduler.stop();
+  alertPolling.stop();
   bot.stop('SIGTERM');
 });
