@@ -1,5 +1,5 @@
 import { differenceInMinutes, differenceInSeconds } from 'date-fns';
-import { Alert, NotificationType, NotificationTypeButtons } from './types';
+import { Alert, NotificationTypeButtons } from './types';
 import { Context, Markup, Telegraf } from 'telegraf';
 import { Database } from './db';
 import { Update } from 'telegraf/types';
@@ -7,23 +7,12 @@ import { ALERT_POLL_TIME_SEC } from '.';
 
 type SendAlertsParams = {
   db: Database;
-  notificationType: NotificationType;
   bot: Telegraf<Context<Update>>;
   alerts: Alert[];
   alertThreshold: number;
 };
 
-export async function sendAlerts({
-  db,
-  notificationType,
-  bot,
-  alerts,
-  alertThreshold,
-}: SendAlertsParams) {
-  const button = NotificationTypeButtons[notificationType].map((b) =>
-    Markup.button.url(b.text, b.url)
-  );
-
+export async function sendAlerts({ db, bot, alerts, alertThreshold }: SendAlertsParams) {
   for (const alert of alerts) {
     const existingAlertDb = await db.getAlert(alert);
 
@@ -72,13 +61,16 @@ export async function sendAlerts({
       continue;
     }
 
-    const notifications = await db.getByNotificationType(notificationType);
+    const notifications = await db.getByNotificationType(alert.notificationType);
+    const buttons = NotificationTypeButtons[alert.notificationType].map((b) =>
+      Markup.button.url(b.text, b.url)
+    );
     let errors = 0;
     for (const { chatId } of notifications) {
       try {
         await bot.telegram.sendMessage(chatId, alert.message, {
           parse_mode: 'Markdown',
-          reply_markup: Markup.inlineKeyboard([button]).reply_markup,
+          reply_markup: Markup.inlineKeyboard([buttons]).reply_markup,
         });
       } catch (err) {
         console.error(

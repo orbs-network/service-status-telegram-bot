@@ -304,7 +304,6 @@ const alertPolling = new CronJob(`*/${ALERT_POLL_TIME_SEC} * * * * *`, async () 
 
     await sendAlerts({
       db,
-      notificationType,
       bot,
       alerts,
       alertThreshold: getAlertThreshold(notificationType),
