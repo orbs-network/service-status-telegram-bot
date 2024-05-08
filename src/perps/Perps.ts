@@ -112,7 +112,9 @@ export class Perps {
               alertType: PerpsAlert.PerpsExposure,
               name: d.symbol,
               timestamp: new Date().getTime(),
-              message: `🚨 *${NotificationTypeNames[notificationType]}* 🚨\n\n*${d.symbol}*: ${exposure}`,
+              message: `🚨 *Exposure Alert* 🚨\n\nEnv: *${isProd ? 'PROD' : 'STAGING'}*\nSymbol: *${
+                d.symbol
+              }*\nAmount: *${exposure}*\nQuantity Delta: *${d.quantityDelta}*`,
             });
           }
         });
@@ -123,7 +125,7 @@ export class Perps {
           alertType: PerpsAlert.PerpsApiDown,
           name: 'Perps Analytics Api Down',
           timestamp: new Date().getTime(),
-          message: `🚨 *Perps Analytics Api Down* [${url === prodEndpoint ? 'PROD' : 'STAGING'}]🚨`,
+          message: `🚨 *Perps Analytics Api Down* [${isProd ? 'PROD' : 'STAGING'}]`,
         });
       }
     }
