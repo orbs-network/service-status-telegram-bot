@@ -1,5 +1,5 @@
 import { differenceInMinutes, differenceInSeconds } from 'date-fns';
-import { Alert, NotificationTypeButtons } from './types';
+import { Alert, NotificationType, NotificationTypeButtons } from './types';
 import { Context, Markup, Telegraf } from 'telegraf';
 import { Database } from './db';
 import { Update } from 'telegraf/types';
@@ -14,6 +14,13 @@ type SendAlertsParams = {
 
 export async function sendAlerts({ db, bot, alerts, alertThreshold }: SendAlertsParams) {
   for (const alert of alerts) {
+    // Custom threshold for fantom EVM Nodes
+    // TODO: need a better solution
+    const threshold =
+      alert.notificationType === NotificationType.EvmNodesAlerts && alert.name === 'fantom'
+        ? 12
+        : alertThreshold;
+
     const existingAlertDb = await db.getAlert(alert);
 
     if (!existingAlertDb) {
@@ -33,10 +40,10 @@ export async function sendAlerts({ db, bot, alerts, alertThreshold }: SendAlerts
     }
 
     const diffInSeconds = differenceInSeconds(new Date().getTime(), existingAlertDb.timestamp);
-    const thresholdInSeconds = alertThreshold * ALERT_POLL_TIME_SEC;
+    const thresholdInSeconds = threshold * ALERT_POLL_TIME_SEC;
     if (
       !existingAlertDb.sent &&
-      existingAlertDb.count < alertThreshold &&
+      existingAlertDb.count < threshold &&
       diffInSeconds > thresholdInSeconds
     ) {
       await db.deleteAlert(existingAlertDb.id);
@@ -47,7 +54,7 @@ export async function sendAlerts({ db, bot, alerts, alertThreshold }: SendAlerts
       continue;
     }
 
-    if (existingAlertDb.count < alertThreshold) {
+    if (existingAlertDb.count < threshold) {
       try {
         await db.appendAlertCount(existingAlertDb.id);
         console.log('Append count to alert', JSON.stringify(existingAlertDb));
