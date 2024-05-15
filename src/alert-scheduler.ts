@@ -29,7 +29,7 @@ export async function sendAlerts({ db, bot, alerts, alertThreshold }: SendAlerts
       continue;
     }
 
-    const diffInMins = differenceInMinutes(existingAlertDb.timestamp, alert.timestamp);
+    const diffInMins = differenceInMinutes(alert.timestamp, existingAlertDb.timestamp);
     if (existingAlertDb.sent && diffInMins >= 60) {
       await db.deleteAlert(existingAlertDb.id);
       console.log(
