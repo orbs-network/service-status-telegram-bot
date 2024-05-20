@@ -40,7 +40,6 @@ bot.command('info', async (ctx) => {
       parse_mode: 'Markdown',
     }
   );
-  return;
 });
 
 bot.on('my_chat_member', async (ctx) => {
