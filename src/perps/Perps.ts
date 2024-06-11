@@ -54,6 +54,19 @@ export class Perps {
         const totalFunds = marginBalance + erc20Balance + totalPartyBUnPnl + partyBAllocatedBalance;
         const onChainValue = totalPartyBUnPnl + partyBAllocatedBalance + erc20Balance;
 
+        console.log('Perps report', {
+          marginBalance,
+          erc20Balance,
+          totalPartyBUnPnl,
+          brokerUpnl,
+          partyBAllocatedBalance,
+          volume,
+          users,
+          trades,
+          totalFunds,
+          onChainValue,
+        });
+
         const tableOutput = [
           ['Trades', trades],
           ['Users', users],
