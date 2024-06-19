@@ -9,10 +9,10 @@ export class Twap {
     const takers: TakerStatus[] = [];
     try {
       const backupTakers = [
-        'https://twap-taker-1.herokuapp.com/health',
+        'https://twap-taker-1-05c260c20df9.herokuapp.com/health',
         'https://twap-taker-2.herokuapp.com/health',
         'https://twap-taker-3-8f650e133459.herokuapp.com/health',
-        'https://twap-taker-4-01f454384aa5.herokuapp.com/health',
+        'https://twap-taker-4-77af356494f9.herokuapp.com/health',
         'https://twap-taker-5-0d0999686c9f.herokuapp.com/health',
         'https://twap-taker-6-4c613d1380ac.herokuapp.com/health',
         'http://198.20.104.2:9000/health',
