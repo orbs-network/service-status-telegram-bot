@@ -15,6 +15,7 @@ export class Twap {
         'https://twap-taker-4-01f454384aa5.herokuapp.com/health',
         'https://twap-taker-5-0d0999686c9f.herokuapp.com/health',
         'https://twap-taker-6-4c613d1380ac.herokuapp.com/health',
+        'http://198.20.104.2:9000/health',
       ];
 
       const results = await Promise.allSettled(backupTakers.map((url) => fetch(url)));
@@ -27,6 +28,7 @@ export class Twap {
         if (!resp.Status) {
           continue;
         }
+
         takers.push({
           name: resp.nodeAddress,
           status: resp.Status.substring(9, resp.Status.indexOf(',')).trim(),
