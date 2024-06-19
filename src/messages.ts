@@ -39,9 +39,9 @@ export async function getAlerts(notificationType: NotificationType) {
       return await DefiNotifications.alerts();
     case NotificationType.EvmNodesAlerts:
       return await EvmNodes.alerts();
-    case NotificationType.PerpsExposureAlertsProd:
-    case NotificationType.PerpsExposureAlertsStaging:
-      return await Perps.alerts();
+    // case NotificationType.PerpsExposureAlertsProd:
+    // case NotificationType.PerpsExposureAlertsStaging:
+    //   return await Perps.alerts();
     default:
       return [];
   }
