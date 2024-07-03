@@ -7,6 +7,7 @@ import { LiquidityHub } from './liquidity-hub';
 import { DefiNotifications } from './defi-notifications';
 import { EvmNodes } from './evm-nodes';
 import { Perps } from './perps';
+import { Solver } from './solver';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -22,6 +23,8 @@ export async function getDailyReport(notificationType: NotificationType) {
       return await EvmNodes.report();
     case NotificationType.PerpsDailyReport:
       return await Perps.report();
+    case NotificationType.Solver:
+      return await Solver.report();
     default:
       return null;
   }
@@ -42,6 +45,8 @@ export async function getAlerts(notificationType: NotificationType) {
     // case NotificationType.PerpsExposureAlertsProd:
     // case NotificationType.PerpsExposureAlertsStaging:
     //   return await Perps.alerts();
+    case NotificationType.SolverAlerts:
+      return await Solver.alerts();
     default:
       return [];
   }
