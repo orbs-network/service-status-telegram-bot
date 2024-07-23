@@ -28,11 +28,11 @@ export class Networks {
         throw new Error('Fetching network statuses');
       }
 
-      const statuses = (await resp.json()) as NetworkStatus;
+      const data = (await resp.json()) as NetworkStatus;
 
       const tableOutput = [
         ['', 'Status'],
-        ...Object.entries(statuses.Statuses).map(([network, status]) => {
+        ...Object.entries(data.Statuses).map(([network, status]) => {
           if (status.Status !== 'Green') {
             errors += `- *${network}*: ${status}\n`;
           }
@@ -60,17 +60,16 @@ export class Networks {
         throw new Error('Fetching network statuses');
       }
 
+      const data = (await resp.json()) as NetworkStatus;
+
       const statuses = {
-        ...((await resp.json()) as NetworkStatus),
-        Statuses: {
-          ...((await resp.json()) as NetworkStatus).Statuses,
-          'TESTING ALERT': {
-            Status: 'Yellow',
-          },
+        ...data.Statuses,
+        'TESTING ALERT': {
+          Status: 'Yellow',
         },
       };
 
-      Object.entries(statuses.Statuses).forEach(([network, status]) => {
+      Object.entries(statuses).forEach(([network, status]) => {
         if (status.Status !== 'Green') {
           alerts.push({
             notificationType: NotificationType.NetworkAlerts,
