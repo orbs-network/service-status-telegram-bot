@@ -28,12 +28,7 @@ export class Networks {
         throw new Error('Fetching network statuses');
       }
 
-      const statuses = {
-        ...((await resp.json()) as NetworkStatus),
-        'TESTING ALERT': {
-          Status: 'Yellow',
-        },
-      };
+      const statuses = (await resp.json()) as NetworkStatus;
 
       const tableOutput = [
         ['', 'Status'],
@@ -65,7 +60,12 @@ export class Networks {
         throw new Error('Fetching network statuses');
       }
 
-      const statuses = (await resp.json()) as NetworkStatus;
+      const statuses = {
+        ...((await resp.json()) as NetworkStatus),
+        'TESTING ALERT': {
+          Status: 'Yellow',
+        },
+      };
 
       Object.entries(statuses.Statuses).forEach(([network, status]) => {
         if (status.Status !== 'Green') {
