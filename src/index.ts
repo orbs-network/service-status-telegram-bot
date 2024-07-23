@@ -291,6 +291,15 @@ function getAlertThreshold(notificationType: NotificationType) {
   }
 }
 
+function getResetThresholdInMins(notificationType: NotificationType) {
+  switch (notificationType) {
+    case NotificationType.NetworkAlerts:
+      return 60 * 24;
+    default:
+      return 60;
+  }
+}
+
 export const ALERT_POLL_TIME_SEC = 30;
 // every 30 seconds
 const alertPolling = new CronJob(`*/${ALERT_POLL_TIME_SEC} * * * * *`, async () => {
@@ -307,6 +316,7 @@ const alertPolling = new CronJob(`*/${ALERT_POLL_TIME_SEC} * * * * *`, async () 
       bot,
       alerts,
       alertThreshold: getAlertThreshold(notificationType),
+      resetThresholdInMins: getResetThresholdInMins(notificationType),
     });
   }
 });

@@ -10,9 +10,16 @@ type SendAlertsParams = {
   bot: Telegraf<Context<Update>>;
   alerts: Alert[];
   alertThreshold: number;
+  resetThresholdInMins: number;
 };
 
-export async function sendAlerts({ db, bot, alerts, alertThreshold }: SendAlertsParams) {
+export async function sendAlerts({
+  db,
+  bot,
+  alerts,
+  alertThreshold,
+  resetThresholdInMins,
+}: SendAlertsParams) {
   for (const alert of alerts) {
     // Custom threshold for fantom EVM Nodes
     // TODO: need a better solution
@@ -30,7 +37,7 @@ export async function sendAlerts({ db, bot, alerts, alertThreshold }: SendAlerts
     }
 
     const diffInMins = differenceInMinutes(alert.timestamp, existingAlertDb.timestamp);
-    if (existingAlertDb.sent && diffInMins >= 60) {
+    if (existingAlertDb.sent && diffInMins >= resetThresholdInMins) {
       await db.deleteAlert(existingAlertDb.id);
       console.log(
         'Deleted existing alert from db as it has passed 60mins',
