@@ -63,15 +63,7 @@ export class Networks {
 
       const data = (await resp.json()) as NetworkStatus;
 
-      const statuses = {
-        ...data.Statuses,
-        '[TEST] Ethereum Contracts Health': {
-          Status: 'Yellow',
-          StatusMsg: 'ETHEREUM Contracts status: ERROR\nTotal Staked: 788,691,544',
-        },
-      };
-
-      Object.entries(statuses).forEach(([network, status]) => {
+      Object.entries(data.Statuses).forEach(([network, status]) => {
         if (status.Status !== 'Green') {
           alerts.push({
             notificationType: NotificationType.NetworkAlerts,
