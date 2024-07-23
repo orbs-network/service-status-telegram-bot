@@ -19,7 +19,7 @@ enum NetworkAlert {
 
 export class Networks {
   static async report() {
-    let output = `📊 *${NotificationTypeNames[NotificationType.LiquidityHub]}*\n\n`;
+    let output = `📊 *${NotificationTypeNames[NotificationType.Network]}*\n\n`;
     let errors = '';
     try {
       const resp = await fetch('https://status.orbs.network/json');
