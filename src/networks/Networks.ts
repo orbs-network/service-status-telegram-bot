@@ -62,8 +62,11 @@ export class Networks {
 
       const statuses = {
         ...((await resp.json()) as NetworkStatus),
-        'TESTING ALERT': {
-          Status: 'Yellow',
+        Statuses: {
+          ...((await resp.json()) as NetworkStatus).Statuses,
+          'TESTING ALERT': {
+            Status: 'Yellow',
+          },
         },
       };
 
