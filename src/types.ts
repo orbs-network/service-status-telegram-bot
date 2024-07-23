@@ -14,6 +14,7 @@ export enum NotificationType {
   PerpsExposureAlertsStaging = 'PerpsExposureAlertsStaging',
   Solver = 'Solver',
   SolverAlerts = 'SolverAlerts',
+  Network = 'Network',
   NetworkAlerts = 'NetworkAlerts',
 }
 
@@ -33,7 +34,8 @@ export const NotificationTypeNames = {
   [NotificationType.PerpsExposureAlertsStaging]: 'Perps Exposure Alerts [STAGING]',
   [NotificationType.Solver]: 'Orbs Solver',
   [NotificationType.SolverAlerts]: 'Orbs Solver Alerts',
-  [NotificationType.NetworkAlerts]: 'Orbs Network Down!',
+  [NotificationType.Network]: 'Orbs Networks',
+  [NotificationType.NetworkAlerts]: 'Orbs Network Alerts',
 };
 
 export const NotificationTypeButtons = {
@@ -95,6 +97,7 @@ export const NotificationTypeButtons = {
   [NotificationType.SolverAlerts]: [
     { text: '🔗 Open status page', url: 'https://utils.orbs.network/orbs-solver/status' },
   ],
+  [NotificationType.Network]: [{ text: '🔗 Open status page', url: 'https://status.orbs.network' }],
   [NotificationType.NetworkAlerts]: [
     { text: '🔗 Open status page', url: 'https://status.orbs.network' },
   ],
@@ -120,6 +123,7 @@ export const StatusTypes = [
   NotificationType.EvmNodesStatus,
   NotificationType.PerpsDailyReport,
   NotificationType.Solver,
+  NotificationType.Network,
 ];
 
 export type Notification = {

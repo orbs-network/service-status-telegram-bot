@@ -26,6 +26,8 @@ export async function getDailyReport(notificationType: NotificationType) {
       return await Perps.report();
     case NotificationType.Solver:
       return await Solver.report();
+    case NotificationType.Network:
+      return await Networks.report();
     default:
       return null;
   }
