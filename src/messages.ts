@@ -8,6 +8,7 @@ import { DefiNotifications } from './defi-notifications';
 import { EvmNodes } from './evm-nodes';
 import { Perps } from './perps';
 import { Solver } from './solver';
+import { Networks } from './networks';
 
 export async function getDailyReport(notificationType: NotificationType) {
   switch (notificationType) {
@@ -47,6 +48,8 @@ export async function getAlerts(notificationType: NotificationType) {
     //   return await Perps.alerts();
     case NotificationType.SolverAlerts:
       return await Solver.alerts();
+    case NotificationType.NetworkAlerts:
+      return await Networks.alerts();
     default:
       return [];
   }
