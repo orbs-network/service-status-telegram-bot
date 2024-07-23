@@ -9,6 +9,7 @@ type NetworkStatus = {
   Statuses: {
     [key: string]: {
       Status: string;
+      StatusMsg: string;
     };
   };
 };
@@ -34,7 +35,7 @@ export class Networks {
         ['', 'Status'],
         ...Object.entries(data.Statuses).map(([network, status]) => {
           if (status.Status !== 'Green') {
-            errors += `- *${network}*: ${status}\n`;
+            errors += `- *${network}*: ${status.StatusMsg}\n`;
           }
 
           return [truncate(network, 20), status.Status === 'Green' ? '✅' : '❌'];
@@ -64,8 +65,9 @@ export class Networks {
 
       const statuses = {
         ...data.Statuses,
-        'TESTING ALERT': {
+        '[TEST] Ethereum Contracts Health': {
           Status: 'Yellow',
+          StatusMsg: 'ETHEREUM Contracts status: ERROR\nTotal Staked: 788,691,544',
         },
       };
 
@@ -78,7 +80,7 @@ export class Networks {
             timestamp: new Date().getTime(),
             message: `🚨 *${
               NotificationTypeNames[NotificationType.NetworkAlerts]
-            }* 🚨\n\n*${network}*: ${status.Status}`,
+            }* 🚨\n\n*${network}*: ${status.StatusMsg}`,
           });
         }
       });
