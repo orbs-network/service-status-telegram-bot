@@ -28,7 +28,13 @@ export class Networks {
         throw new Error('Fetching network statuses');
       }
 
-      const statuses = (await resp.json()) as NetworkStatus;
+      const statuses = {
+        ...((await resp.json()) as NetworkStatus),
+        'TESTING ALERT': {
+          Status: 'Yellow',
+        },
+      };
+
       const tableOutput = [
         ['', 'Status'],
         ...Object.entries(statuses.Statuses).map(([network, status]) => {
