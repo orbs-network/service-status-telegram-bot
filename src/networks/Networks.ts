@@ -5,13 +5,12 @@ import { Alert, NotificationType, NotificationTypeNames } from '../types';
 import { truncate } from '../utils';
 import { config } from '../config';
 
+const endpointUrl = 'https://solver.orbs.network:8443/orbs-solver/status';
+
 type NetworkStatus = {
-  Statuses: {
-    [key: string]: {
-      Status: string;
-      StatusMsg: string;
-    };
-  };
+  Hostname: string;
+  Status: string;
+  Error: string;
 };
 
 enum NetworkAlert {
@@ -23,7 +22,7 @@ export class Networks {
     let output = `📊 *${NotificationTypeNames[NotificationType.Network]}*\n\n`;
     let errors = '';
     try {
-      const resp = await fetch('https://status.orbs.network/json');
+      const resp = await fetch(endpointUrl);
 
       if (resp.status !== 200) {
         throw new Error('Fetching network statuses');
@@ -31,15 +30,14 @@ export class Networks {
 
       const data = (await resp.json()) as NetworkStatus;
 
+      if (data.Status !== 'OK') {
+        errors += `- *${data.Hostname}*: ${data.Error}\n`;
+      }
+
       const tableOutput = [
         ['', 'Status'],
-        ...Object.entries(data.Statuses).map(([network, status]) => {
-          if (status.Status !== 'Green') {
-            errors += `- *${network}*: ${status.StatusMsg}\n`;
-          }
 
-          return [truncate(network, 20), status.Status === 'Green' ? '✅' : '❌'];
-        }),
+        [truncate(data.Hostname, 20), data.Status === 'OK' ? '✅' : '❌'],
       ];
       output += `\`\`\`\n${table(tableOutput, config.AsciiTableOpts)}\n\`\`\``;
       if (errors.length > 0) {
@@ -55,7 +53,7 @@ export class Networks {
   static async alerts() {
     const alerts: Alert[] = [];
     try {
-      const resp = await fetch('https://status.orbs.network/json');
+      const resp = await fetch(endpointUrl);
 
       if (resp.status !== 200) {
         throw new Error('Fetching network statuses');
@@ -63,19 +61,17 @@ export class Networks {
 
       const data = (await resp.json()) as NetworkStatus;
 
-      Object.entries(data.Statuses).forEach(([network, status]) => {
-        if (status.Status !== 'Green') {
-          alerts.push({
-            notificationType: NotificationType.NetworkAlerts,
-            alertType: NetworkAlert.NetworkDown,
-            name: network,
-            timestamp: new Date().getTime(),
-            message: `🚨 *${
-              NotificationTypeNames[NotificationType.NetworkAlerts]
-            }* 🚨\n\n*${network}*: ${status.StatusMsg}`,
-          });
-        }
-      });
+      if (data.Status !== 'OK') {
+        alerts.push({
+          notificationType: NotificationType.NetworkAlerts,
+          alertType: NetworkAlert.NetworkDown,
+          name: data.Hostname,
+          timestamp: new Date().getTime(),
+          message: `🚨 *${NotificationTypeNames[NotificationType.NetworkAlerts]}* 🚨\n\n*${
+            data.Hostname
+          }*: ${data.Error}`,
+        });
+      }
     } catch (err) {
       console.error('Error Network alerts', err);
     }
