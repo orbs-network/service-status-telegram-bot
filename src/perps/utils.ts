@@ -3,7 +3,7 @@ import { config } from '../config';
 import { dollar } from '../utils';
 import { ElasticsearchResponse } from './types';
 
-export function getSummaryTableOutput(env: string, data: ElasticsearchResponse, liqData: any[]) {
+export function getSummaryOutput(env: string, data: ElasticsearchResponse, liqData: any[]) {
   const marginBalance =
     data.aggregations[0].buckets[0].marginBalance?.marginBalance.hits?.hits[0].fields
       .marginBalanceNum[0] || 0;
@@ -37,7 +37,7 @@ export function getSummaryTableOutput(env: string, data: ElasticsearchResponse, 
     ['Net uPnL to Funds', netUpnlFundsPercentage.toFixed(2) + '%'],
   ];
 
-  let output = `\n\n*${env.toUpperCase()}*\n`;
+  let output = `*SUMMARY*\n`;
   output += `\`\`\`\n${table(tableOutput, {
     ...config.AsciiTableOpts,
     columns: {

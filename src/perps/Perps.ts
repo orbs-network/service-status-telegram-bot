@@ -3,7 +3,7 @@ import { ElasticsearchResponse, PairExposureComparison, PerpsAlert } from './typ
 import { dollar } from '../utils';
 import { format, startOfDay, subDays } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
-import { getSummaryTableOutput } from './utils';
+import { getSummaryOutput } from './utils';
 
 export const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-lambda*/_search';
 const stagingEndpoint =
@@ -25,6 +25,8 @@ export class Perps {
     const envs = ['prod'];
 
     for (const env of envs) {
+      output = `\n\n*${env.toUpperCase()}*\n`;
+
       try {
         const resp = await fetch(kibanaEndpoint, {
           method: 'POST',
@@ -41,7 +43,7 @@ export class Perps {
         const data = (await resp.json()) as ElasticsearchResponse;
 
         const liqResp = await fetch(
-          `${hedgerProdApiUrl}/aggregated-trades?earliestTimeMs=${startDate.getTime()}&latestTimeMs=${endDate.getTime()}&quoteStatus=LIQUIDATED&limit=1000`
+          `${hedgerProdApiUrl}/aggregated-trades?earliestTimeMs=${startDate.getTime()}&latestTimeMs=${endDate.getTime()}&quoteStatus=LIQUIDATED&limit=1000&partyBs=0xD5A075C88A4188d666FA1e4051913BE6782982DA%2C0x614bB1F3e0Ae5A393979468ED89088F05277312c%2C0x00c069d68bc7420740460DBC3cc3fFF9b3742421`
         );
 
         if (liqResp.status !== 200) {
@@ -50,7 +52,7 @@ export class Perps {
 
         const liqData = (await liqResp.json()) as any[];
 
-        output += getSummaryTableOutput(env, data, liqData);
+        output += getSummaryOutput(env, data, liqData);
       } catch (err) {
         console.error('Error running Perps report', err);
         output += '\nError running Perps report';
