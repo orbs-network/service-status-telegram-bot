@@ -84,8 +84,10 @@ export const NotificationTypeButtons = {
     { text: '🔗 Open status page', url: 'https://services-healthpage.orbs.network/#/evm-nodes' },
   ],
   [NotificationType.PerpsDailyReport]: [
-    { text: '🔗 View STAGING', url: 'https://staging-perps.orbs.network' },
-    { text: '🔗 View PROD', url: 'https://prod-perps.orbs.network' },
+    {
+      text: '🔗 View dashboard',
+      url: 'https://logs.orbs.network/app/dashboards?auth_provider_hint=anonymous1#/view/bcb99b30-4fff-11ef-b884-351c9b2f1cbe?_g=(filters%3A!()%2CrefreshInterval%3A(pause%3A!t%2Cvalue%3A0)%2Ctime%3A(from%3Anow-1w%2Cto%3Anow))',
+    },
   ],
   [NotificationType.PerpsExposureAlertsProd]: [
     { text: '🔗 See on PROD', url: 'https://prod-perps.orbs.network/exposure' },
