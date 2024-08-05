@@ -1,3 +1,5 @@
+import { solverEndpointUrl } from './solver';
+
 export enum NotificationType {
   WalletManager = 'WalletManager',
   Twap = 'TWAP',
@@ -91,12 +93,8 @@ export const NotificationTypeButtons = {
   [NotificationType.PerpsExposureAlertsStaging]: [
     { text: '🔗 See on STAGING', url: 'https://staging-perps.orbs.network/exposure' },
   ],
-  [NotificationType.Solver]: [
-    { text: '🔗 Open status page', url: 'https://utils.orbs.network/orbs-solver/status' },
-  ],
-  [NotificationType.SolverAlerts]: [
-    { text: '🔗 Open status page', url: 'https://utils.orbs.network/orbs-solver/status' },
-  ],
+  [NotificationType.Solver]: [{ text: '🔗 Open status page', url: solverEndpointUrl }],
+  [NotificationType.SolverAlerts]: [{ text: '🔗 Open status page', url: solverEndpointUrl }],
   [NotificationType.Network]: [{ text: '🔗 Open status page', url: 'https://status.orbs.network' }],
   [NotificationType.NetworkAlerts]: [
     { text: '🔗 Open status page', url: 'https://status.orbs.network' },

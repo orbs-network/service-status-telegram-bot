@@ -3,12 +3,14 @@ import { config } from '../config';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
 import { SolverAlert, SolverStatus } from './types';
 
+export const solverEndpointUrl = 'https://solver.orbs.network:8443/orbs-solver/status';
+
 export class Solver {
   static async report() {
     let output = `📊 *${NotificationTypeNames[NotificationType.Solver]}*\n\n`;
     let errors = '';
     try {
-      const resp = await fetch('https://utils.orbs.network/orbs-solver/status');
+      const resp = await fetch(solverEndpointUrl);
       const result = (await resp.json()) as SolverStatus;
 
       if (result.Status !== 'OK') {
@@ -33,7 +35,7 @@ export class Solver {
   static async alerts() {
     const alerts: Alert[] = [];
     try {
-      const resp = await fetch('https://utils.orbs.network/orbs-solver/status');
+      const resp = await fetch(solverEndpointUrl);
       const result = (await resp.json()) as SolverStatus;
 
       if (result.Status !== 'OK') {
