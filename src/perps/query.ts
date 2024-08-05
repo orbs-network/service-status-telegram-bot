@@ -940,40 +940,6 @@ export function getCrossChain(env: string, startDate: Date, endDate: Date) {
               },
             },
           },
-          volume: {
-            filter: {
-              bool: {
-                must: [],
-                filter: [
-                  {
-                    bool: {
-                      should: [
-                        {
-                          match: {
-                            msgCode: '[TRADE_OPEN_CONFIRMED,TRADE_CLOSE_CONFIRMED]',
-                          },
-                        },
-                      ],
-                      minimum_should_match: 1,
-                    },
-                  },
-                ],
-                should: [],
-                must_not: [],
-              },
-            },
-            aggs: {
-              volume: {
-                sum: {
-                  script: {
-                    source:
-                      "if (doc['notionalValue.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['notionalValue.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
-                    lang: 'painless',
-                  },
-                },
-              },
-            },
-          },
           totalInitialLongNotional: {
             filter: {
               bool: {

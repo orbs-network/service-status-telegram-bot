@@ -113,7 +113,6 @@ export function getCrossChainOutput(data: ElasticsearchResponse) {
       data.aggregations[0].buckets[0].partyBAllocatedBalance?.partyBAllocatedBalance.hits?.hits[0]
         .fields.partyBAllocatedBalanceNum[0]
     ) || 0;
-  const volume = data.aggregations[0].buckets[0].volume?.volume.value || 0;
   const totalFunds = erc20Balance + totalPartyBUnPnl + partyBAllocatedBalance;
   const longNotional =
     Number(
@@ -133,7 +132,6 @@ export function getCrossChainOutput(data: ElasticsearchResponse) {
 
   const tableOutput = [
     ['Total Funds', dollar.format(totalFunds)],
-    ['Volume', dollar.format(volume)],
     ['Alloc.', dollar.format(partyBAllocatedBalance)],
     ['Longs', dollar.format(longNotional)],
     ['Shorts', dollar.format(shortNotional)],
