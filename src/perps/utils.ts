@@ -96,3 +96,57 @@ export function getBinanceOutput(data: ElasticsearchResponse) {
 
   return output;
 }
+
+export function getCrossChainOutput(data: ElasticsearchResponse) {
+  const erc20Balance =
+    Number(
+      data.aggregations[0].buckets[0].erc20Balance?.erc20Balance.hits?.hits[0].fields
+        .erc20BalanceNum[0]
+    ) || 0;
+  const totalPartyBUnPnl =
+    Number(
+      data.aggregations[0].buckets[0].totalPartyBUnPnl?.totalPartyBUnPnl.hits?.hits[0].fields
+        .totalPartyBUnPnl[0]
+    ) || 0;
+  const partyBAllocatedBalance =
+    Number(
+      data.aggregations[0].buckets[0].partyBAllocatedBalance?.partyBAllocatedBalance.hits?.hits[0]
+        .fields.partyBAllocatedBalanceNum[0]
+    ) || 0;
+  const volume = data.aggregations[0].buckets[0].volume?.volume.value || 0;
+  const totalFunds = erc20Balance + totalPartyBUnPnl + partyBAllocatedBalance;
+  const longNotional =
+    Number(
+      data.aggregations[0].buckets[0].totalInitialLongNotional?.totalInitialLongNotional.hits
+        ?.hits[0].fields.totalInitialLongNotional[0]
+    ) || 0;
+  const shortNotional =
+    Number(
+      data.aggregations[0].buckets[0].totalInitialShortNotional?.totalInitialShortNotional.hits
+        ?.hits[0].fields.totalInitialShortNotional[0]
+    ) || 0;
+  const longShortRatio =
+    Number(
+      data.aggregations[0].buckets[0].initialLongShortRatio?.initialLongShortRatio.hits?.hits[0]
+        .fields.initialLongShortRatio[0]
+    ) || 0;
+
+  const tableOutput = [
+    ['Total Funds', dollar.format(totalFunds)],
+    ['Volume', dollar.format(volume)],
+    ['Alloc.', dollar.format(partyBAllocatedBalance)],
+    ['Longs', dollar.format(longNotional)],
+    ['Shorts', dollar.format(shortNotional)],
+    ['L/S Ratio', longShortRatio],
+  ];
+
+  let output = `*CROSS CHAIN*\n`;
+  output += `\`\`\`\n${table(tableOutput, {
+    ...config.AsciiTableOpts,
+    columns: {
+      0: { width: 8, wrapWord: true },
+    },
+  })}\n\`\`\``;
+
+  return output;
+}

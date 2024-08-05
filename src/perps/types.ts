@@ -60,6 +60,16 @@ interface Bucket {
   maintenanceMargin?: {
     maintenanceMargin: DocCountHits;
   };
+
+  totalInitialLongNotional?: {
+    totalInitialLongNotional: DocCountHits;
+  };
+  totalInitialShortNotional?: {
+    totalInitialShortNotional: DocCountHits;
+  };
+  initialLongShortRatio?: {
+    initialLongShortRatio: DocCountHits;
+  };
 }
 
 interface DocCount {

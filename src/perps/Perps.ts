@@ -1,9 +1,9 @@
-import { getBinance, getSummary } from './query';
+import { getBinance, getCrossChain, getSummary } from './query';
 import { ElasticsearchResponse, PairExposureComparison, PerpsAlert } from './types';
 import { dollar } from '../utils';
 import { format, startOfDay, subDays } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
-import { getBinanceOutput, getSummaryOutput } from './utils';
+import { getBinanceOutput, getCrossChainOutput, getSummaryOutput } from './utils';
 
 export const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-lambda*/_search';
 const stagingEndpoint =
@@ -67,7 +67,32 @@ export class Perps {
 
       output += getBinanceOutput(data);
     } catch (err) {
-      console.error('Perps report', err);
+      console.error('Perps report binance', err);
+      output += '\nError running Perps report';
+    }
+    return output;
+  }
+
+  static async crossChain(env: string, startDate: Date, endDate: Date) {
+    let output = '';
+    try {
+      const resp = await fetch(kibanaEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: getCrossChain(env, startDate, endDate),
+      });
+
+      if (resp.status !== 200) {
+        throw new Error('Error fetching Kibana data');
+      }
+
+      const data = (await resp.json()) as ElasticsearchResponse;
+
+      output += getCrossChainOutput(data);
+    } catch (err) {
+      console.error('Perps report cross chain', err);
       output += '\nError running Perps report';
     }
     return output;
@@ -89,6 +114,8 @@ export class Perps {
       output += await Perps.summary(env, startDate, endDate);
       output += '\n\n';
       output += await Perps.binance(env, startDate, endDate);
+      output += '\n\n';
+      output += await Perps.crossChain(env, startDate, endDate);
     }
 
     return output;
