@@ -4,6 +4,7 @@ import { PerpsAlert } from './perps/types';
 import { Alert, NotificationType, NotificationTypeButtons, NotificationTypeNames } from './types';
 import { dollar } from './utils';
 import { Perps } from './perps';
+import { startOfDay, subDays } from 'date-fns';
 
 async function testExposureAlert() {
   const alert: Alert = {
@@ -42,6 +43,8 @@ async function testExposureAlert() {
 // testExposureAlert();
 
 async function testPerpsReport() {
+  const endDate = startOfDay(new Date());
+  const startDate = subDays(endDate, 1);
   const report = await Perps.report();
   console.log(report);
 }

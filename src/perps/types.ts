@@ -54,6 +54,12 @@ interface Bucket {
   partyBAllocatedBalance?: {
     partyBAllocatedBalance: DocCountHits;
   };
+  leverage?: {
+    leverage: DocCountHits;
+  };
+  maintenanceMargin?: {
+    maintenanceMargin: DocCountHits;
+  };
 }
 
 interface DocCount {
@@ -85,7 +91,7 @@ interface HitItem {
   _id: string;
   _score: null;
   fields: {
-    [key: string]: Array<number>;
+    [key: string]: Array<number | string>;
   };
   sort: number[];
 }
