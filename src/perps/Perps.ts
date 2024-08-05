@@ -1,24 +1,28 @@
-import { table } from 'table';
-import { config } from '../config';
-import { getQuery } from './query';
+import { getSummary } from './query';
 import { ElasticsearchResponse, PairExposureComparison, PerpsAlert } from './types';
 import { dollar } from '../utils';
-import { format, subDays } from 'date-fns';
+import { format, startOfDay, subDays } from 'date-fns';
 import { Alert, NotificationType, NotificationTypeNames } from '../types';
+import { getSummaryTableOutput } from './utils';
 
-const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-lambda*/_search';
+export const kibanaEndpoint = 'http://3.141.233.132:9200/orbs-perps-lambda*/_search';
 const stagingEndpoint =
   'http://nginx-staging-lb-1142917146.ap-northeast-1.elb.amazonaws.com/analytics/v1';
 const prodEndpoint = 'http://nginx-prod-lb-501211187.ap-northeast-1.elb.amazonaws.com/analytics/v1';
 
+const hedgerProdApiUrl = 'https://staging.perps-streaming.com/analytics/v1';
+
 export class Perps {
   static async report() {
+    const endDate = startOfDay(new Date());
+    const startDate = subDays(endDate, 1);
+
     let output = `📊 *${NotificationTypeNames[NotificationType.PerpsDailyReport]}* - ${format(
-      subDays(new Date(), 1),
+      startDate,
       'dd/MM/yyyy'
     )}`;
 
-    const envs = ['staging', 'prod'];
+    const envs = ['prod'];
 
     for (const env of envs) {
       try {
@@ -27,66 +31,26 @@ export class Perps {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: getQuery(env),
+          body: getSummary(env, startDate, endDate),
         });
+
+        if (resp.status !== 200) {
+          throw new Error('Error fetching Kibana data');
+        }
 
         const data = (await resp.json()) as ElasticsearchResponse;
 
-        const marginBalance =
-          data.aggregations[0].buckets[0].marginBalance?.marginBalance.hits?.hits[0].fields
-            .marginBalanceNum[0] || 0;
-        const erc20Balance =
-          data.aggregations[0].buckets[0].erc20Balance?.erc20Balance.hits?.hits[0].fields
-            .erc20BalanceNum[0] || 0;
-        const totalPartyBUnPnl =
-          data.aggregations[0].buckets[0].totalPartyBUnPnl?.totalPartyBUnPnl.hits?.hits[0].fields
-            .totalPartyBUnPnl[0] || 0;
-        const brokerUpnl =
-          data.aggregations[0].buckets[0].brokerUpnl?.brokerUpnl.hits?.hits[0].fields[
-            'upnl.keyword'
-          ][0] || 0;
-        const partyBAllocatedBalance =
-          data.aggregations[0].buckets[0].partyBAllocatedBalance?.partyBAllocatedBalance.hits
-            ?.hits[0].fields.partyBAllocatedBalanceNum[0] || 0;
-        const volume = data.aggregations[0].buckets[0].volume?.volume.value || 0;
-        const users = data.aggregations[0].buckets[0].users?.users.value || 0;
-        const trades = data.aggregations[0].buckets[0].trades?.doc_count || 0;
-        const totalFunds = marginBalance + erc20Balance + totalPartyBUnPnl + partyBAllocatedBalance;
-        const onChainValue = totalPartyBUnPnl + partyBAllocatedBalance + erc20Balance;
+        const liqResp = await fetch(
+          `${hedgerProdApiUrl}/aggregated-trades?earliestTimeMs=${startDate.getTime()}&latestTimeMs=${endDate.getTime()}&quoteStatus=LIQUIDATED&limit=1000`
+        );
 
-        console.log('Perps report', {
-          marginBalance,
-          erc20Balance,
-          totalPartyBUnPnl,
-          brokerUpnl,
-          partyBAllocatedBalance,
-          volume,
-          users,
-          trades,
-          totalFunds,
-          onChainValue,
-        });
+        if (liqResp.status !== 200) {
+          throw new Error('Error fetching liquidations');
+        }
 
-        const tableOutput = [
-          ['Trades', trades],
-          ['Users', users],
-          ['Volume', dollar.format(volume)],
-          ['Total Funds', dollar.format(totalFunds)],
-          ['Chain Value', dollar.format(onChainValue)],
-          ['Binance Value', dollar.format(marginBalance)],
-          ['Chain Alloc.', dollar.format(partyBAllocatedBalance)],
-          ['Chain Unalloc.', dollar.format(erc20Balance)],
-          ['Chain uPnL', dollar.format(totalPartyBUnPnl)],
-          ['Binance uPnL', dollar.format(brokerUpnl)],
-        ];
+        const liqData = (await liqResp.json()) as any[];
 
-        output += `\n\n*${env.toUpperCase()}*\n`;
-        output += `\`\`\`\n${table(tableOutput, {
-          ...config.AsciiTableOpts,
-          columns: {
-            0: { width: 8, wrapWord: true },
-          },
-        })}\n\`\`\``;
+        output += getSummaryTableOutput(env, data, liqData);
       } catch (err) {
         console.error('Error running Perps report', err);
         output += '\nError running Perps report';

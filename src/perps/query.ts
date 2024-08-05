@@ -1,6 +1,6 @@
-import { format, subDays } from 'date-fns';
+import { format } from 'date-fns';
 
-export const getQuery = (env: string) => {
+export function getSummary(env: string, startDate: Date, endDate: Date) {
   return JSON.stringify({
     aggs: {
       '0': {
@@ -9,7 +9,7 @@ export const getQuery = (env: string) => {
           calendar_interval: '1d',
         },
         aggs: {
-          trades: {
+          marginBalance: {
             filter: {
               bool: {
                 must: [],
@@ -19,30 +19,7 @@ export const getQuery = (env: string) => {
                       should: [
                         {
                           match: {
-                            msgCode: '[TRADE_OPEN_CONFIRMED,TRADE_CLOSE_CONFIRMED]',
-                          },
-                        },
-                      ],
-                      minimum_should_match: 1,
-                    },
-                  },
-                ],
-                should: [],
-                must_not: [],
-              },
-            },
-          },
-          users: {
-            filter: {
-              bool: {
-                must: [],
-                filter: [
-                  {
-                    bool: {
-                      should: [
-                        {
-                          match: {
-                            msgCode: '[TRADE_OPEN_CONFIRMED,TRADE_CLOSE_CONFIRMED]',
+                            msgCode: 'BROKER_BALANCE',
                           },
                         },
                       ],
@@ -55,9 +32,25 @@ export const getQuery = (env: string) => {
               },
             },
             aggs: {
-              users: {
-                cardinality: {
-                  field: 'partyA.keyword',
+              marginBalance: {
+                top_hits: {
+                  script_fields: {
+                    marginBalanceNum: {
+                      script: {
+                        source:
+                          "if (doc['marginBalance.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['marginBalance.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
+                        lang: 'painless',
+                      },
+                    },
+                  },
+                  size: 1,
+                  sort: [
+                    {
+                      timestamp: {
+                        order: 'desc',
+                      },
+                    },
+                  ],
                 },
               },
             },
@@ -92,52 +85,6 @@ export const getQuery = (env: string) => {
                       script: {
                         source:
                           "if (doc['totalPartyBUpnl.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['totalPartyBUpnl.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
-                        lang: 'painless',
-                      },
-                    },
-                  },
-                  size: 1,
-                  sort: [
-                    {
-                      timestamp: {
-                        order: 'desc',
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          },
-          erc20Balance: {
-            filter: {
-              bool: {
-                must: [],
-                filter: [
-                  {
-                    bool: {
-                      should: [
-                        {
-                          match: {
-                            msgCode: 'ERC20_BALANCE',
-                          },
-                        },
-                      ],
-                      minimum_should_match: 1,
-                    },
-                  },
-                ],
-                should: [],
-                must_not: [],
-              },
-            },
-            aggs: {
-              erc20Balance: {
-                top_hits: {
-                  script_fields: {
-                    erc20BalanceNum: {
-                      script: {
-                        source:
-                          "if (doc['erc20Balance.keyword'].size() == 0) { return 0; \n// or any default value you prefer \n} else { return Double.parseDouble(doc['erc20Balance.keyword'].value); \n// Use Double.parseDouble for floating point numbers \n}\n",
                         lang: 'painless',
                       },
                     },
@@ -200,7 +147,7 @@ export const getQuery = (env: string) => {
               },
             },
           },
-          marginBalance: {
+          erc20Balance: {
             filter: {
               bool: {
                 must: [],
@@ -210,7 +157,7 @@ export const getQuery = (env: string) => {
                       should: [
                         {
                           match: {
-                            msgCode: 'BROKER_BALANCE',
+                            msgCode: 'ERC20_BALANCE',
                           },
                         },
                       ],
@@ -223,13 +170,13 @@ export const getQuery = (env: string) => {
               },
             },
             aggs: {
-              marginBalance: {
+              erc20Balance: {
                 top_hits: {
                   script_fields: {
-                    marginBalanceNum: {
+                    erc20BalanceNum: {
                       script: {
                         source:
-                          "if (doc['marginBalance.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['marginBalance.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
+                          "if (doc['erc20Balance.keyword'].size() == 0) {\n    return 0;\n} else {\n    return Double.parseDouble(doc['erc20Balance.keyword'].value);\n}",
                         lang: 'painless',
                       },
                     },
@@ -280,6 +227,29 @@ export const getQuery = (env: string) => {
               },
             },
           },
+          trades: {
+            filter: {
+              bool: {
+                must: [],
+                filter: [
+                  {
+                    bool: {
+                      should: [
+                        {
+                          match: {
+                            msgCode: '[TRADE_OPEN_CONFIRMED,TRADE_CLOSE_CONFIRMED]',
+                          },
+                        },
+                      ],
+                      minimum_should_match: 1,
+                    },
+                  },
+                ],
+                should: [],
+                must_not: [],
+              },
+            },
+          },
           brokerUpnl: {
             filter: {
               bool: {
@@ -305,12 +275,15 @@ export const getQuery = (env: string) => {
             aggs: {
               brokerUpnl: {
                 top_hits: {
-                  fields: [
-                    {
-                      field: 'upnl.keyword',
+                  script_fields: {
+                    brokerUpnl: {
+                      script: {
+                        source:
+                          "if (doc['upnl.keyword'].size() == 0) { \n    return 0; \n    // or any default value you prefer \n    } else { \n        return Double.parseDouble(doc['upnl.keyword'].value); \n        // Use Double.parseDouble for floating point numbers \n    }",
+                        lang: 'painless',
+                      },
                     },
-                  ],
-                  _source: false,
+                  },
                   size: 1,
                   sort: [
                     {
@@ -323,25 +296,51 @@ export const getQuery = (env: string) => {
               },
             },
           },
+          users: {
+            filter: {
+              bool: {
+                must: [],
+                filter: [
+                  {
+                    bool: {
+                      should: [
+                        {
+                          match: {
+                            msgCode: '[TRADE_OPEN_CONFIRMED,TRADE_CLOSE_CONFIRMED]',
+                          },
+                        },
+                      ],
+                      minimum_should_match: 1,
+                    },
+                  },
+                ],
+                should: [],
+                must_not: [],
+              },
+            },
+            aggs: {
+              users: {
+                cardinality: {
+                  field: 'partyA.keyword',
+                },
+              },
+            },
+          },
         },
       },
     },
     size: 0,
     fields: [
       {
-        field: 'cloudWatchLogEvents.timestamp',
-        format: 'date_time',
-      },
-      {
         field: 'timestamp',
         format: 'date_time',
       },
     ],
     script_fields: {
-      gasPaid: {
+      filledAmount: {
         script: {
           source:
-            "if (doc['gasPaid.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['gasPaid.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
+            "if (doc.containsKey('filledAmount.keyword') && doc['filledAmount.keyword'].size() > 0) {\n    return Double.parseDouble(doc['filledAmount.keyword'].value); // Use Double.parseDouble for floating point numbers\n} else {\n    return 0; // or any default value you prefer\n}",
           lang: 'painless',
         },
       },
@@ -355,14 +354,7 @@ export const getQuery = (env: string) => {
       erc20BalanceNum: {
         script: {
           source:
-            "if (doc['erc20Balance.keyword'].size() == 0) { return 0; \n// or any default value you prefer \n} else { return Double.parseDouble(doc['erc20Balance.keyword'].value); \n// Use Double.parseDouble for floating point numbers \n}\n",
-          lang: 'painless',
-        },
-      },
-      volumeUSD: {
-        script: {
-          source:
-            "if (doc['notionalValue.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['notionalValue.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
+            "if (doc['erc20Balance.keyword'].size() == 0) {\n    return 0;\n} else {\n    return Double.parseDouble(doc['erc20Balance.keyword'].value);\n}",
           lang: 'painless',
         },
       },
@@ -380,10 +372,17 @@ export const getQuery = (env: string) => {
           lang: 'painless',
         },
       },
-      gasBalanceNum: {
+      gasPaidNum: {
         script: {
           source:
-            "if (doc['balance.keyword'].size() == 0) { \n    return 0; // or any default value you prefer \n} else { \n    return Double.parseDouble(doc['balance.keyword'].value); // Use Double.parseDouble for floating point numbers \n}",
+            "if (doc['gasPaid.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['gasPaid.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
+          lang: 'painless',
+        },
+      },
+      volumeUSD: {
+        script: {
+          source:
+            "if (doc['notionalValue.keyword'].size() == 0) { \n    return 0; // or any default value you prefer\n} else {\n    return Double.parseDouble(doc['notionalValue.keyword'].value); \n    // Use Double.parseDouble for floating point numbers\n}",
           lang: 'painless',
         },
       },
@@ -391,6 +390,41 @@ export const getQuery = (env: string) => {
         script: {
           source:
             "if (doc['address.keyword'].size() == 0) {\n    return ''\n} else if (doc['symmId.keyword'].size() == 0) { \n    return '56a-' + doc['address.keyword'].value\n} else { \n    return doc['symmId.keyword'].value + '-' + doc['address.keyword'].value\n}",
+          lang: 'painless',
+        },
+      },
+      partyBAllocatedBalanceForSymmIdNum: {
+        script: {
+          source:
+            "if (doc['partyBAllocatedBalance.keyword'].size() == 0) { \n    return 0; // or any default value you prefer \n} else { \n    return Double.parseDouble(doc['partyBAllocatedBalance.keyword'].value); // Use Double.parseDouble for floating point numbers\n}",
+          lang: 'painless',
+        },
+      },
+      partyBUPNLForSymmIdNum: {
+        script: {
+          source:
+            "if (doc['partyBUpnl.keyword'].size() == 0) { \n    return 0; // or any default value you prefer \n} else { \n    return Double.parseDouble(doc['partyBUpnl.keyword'].value); // Use Double.parseDouble for floating point numbers\n}",
+          lang: 'painless',
+        },
+      },
+      partyBUnallocatedBalanceForSymmIdNum: {
+        script: {
+          source:
+            "if (doc['partyBUnallocatedBalance.keyword'].size() == 0) { \n    return 0; // or any default value you prefer \n} else { \n    return Double.parseDouble(doc['partyBUnallocatedBalance.keyword'].value); // Use Double.parseDouble for floating point numbers\n}",
+          lang: 'painless',
+        },
+      },
+      gasBalanceNum: {
+        script: {
+          source:
+            "if (doc['balance'] instanceof float) {\n    return doc['balance'].value\n} else if (doc.containsKey('balance.keyword') && doc['balance.keyword'].size() > 0) {\n    return Double.parseDouble(doc['balance.keyword'].value); // Use Double.parseDouble for floating point numbers\n} else {\n    return 0; // or any default value you prefer\n}\n",
+          lang: 'painless',
+        },
+      },
+      brokerUpnl: {
+        script: {
+          source:
+            "if (doc['upnl.keyword'].size() == 0) { \n    return 0; \n    // or any default value you prefer \n    } else { \n        return Double.parseDouble(doc['upnl.keyword'].value); \n        // Use Double.parseDouble for floating point numbers \n    }",
           lang: 'painless',
         },
       },
@@ -419,8 +453,8 @@ export const getQuery = (env: string) => {
           {
             range: {
               timestamp: {
-                gte: format(subDays(new Date(), 1), 'yyyy-MM-dd'),
-                lte: format(new Date(), 'yyyy-MM-dd'),
+                gte: format(startDate, 'yyyy-MM-dd'),
+                lte: format(endDate, 'yyyy-MM-dd'),
               },
             },
           },
@@ -430,4 +464,4 @@ export const getQuery = (env: string) => {
       },
     },
   });
-};
+}

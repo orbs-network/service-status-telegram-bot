@@ -3,6 +3,7 @@ import { config } from './config';
 import { PerpsAlert } from './perps/types';
 import { Alert, NotificationType, NotificationTypeButtons, NotificationTypeNames } from './types';
 import { dollar } from './utils';
+import { Perps } from './perps';
 
 async function testExposureAlert() {
   const alert: Alert = {
@@ -38,4 +39,11 @@ async function testExposureAlert() {
   console.log(await result.json());
 }
 
-testExposureAlert();
+// testExposureAlert();
+
+async function testPerpsReport() {
+  const report = await Perps.report();
+  console.log(report);
+}
+
+testPerpsReport();
