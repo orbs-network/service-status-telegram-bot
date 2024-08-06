@@ -169,12 +169,13 @@ export function getPerSymmIdOutput(data: ElasticsearchResponse) {
     const symmId = symmIdBucket.key;
     const partyBUnallocatedBalanceForSymmId =
       Number(
-        symmIdBucket['1']?.buckets[0].partyBUnallocatedBalance?.partyBUnallocatedBalance.hits
-          ?.hits[0].fields.partyBUnallocatedBalanceNum[0]
+        symmIdBucket['1']?.buckets[0].partyBUnallocatedBalanceForSymmId
+          ?.partyBUnallocatedBalanceForSymmId.hits?.hits[0].fields
+          .partyBUnallocatedBalanceForSymmIdNum[0]
       ) || 0;
     const partyBUPNLForSymmId =
       Number(
-        symmIdBucket['1']?.buckets[0].partyBUPNL?.partyBUPNL.hits?.hits[0].fields
+        symmIdBucket['1']?.buckets[0].partyBUPNLForSymmId?.partyBUPNLForSymmId.hits?.hits[0].fields
           .partyBUPNLForSymmIdNum[0]
       ) || 0;
     const partyBAllocatedBalanceForSymmId =
@@ -183,6 +184,12 @@ export function getPerSymmIdOutput(data: ElasticsearchResponse) {
           ?.partyBAllocatedBalanceForSymmId.hits?.hits[0].fields
           .partyBAllocatedBalanceForSymmIdNum[0]
       ) || 0;
+
+    console.log(
+      partyBUnallocatedBalanceForSymmId,
+      partyBUPNLForSymmId,
+      partyBAllocatedBalanceForSymmId
+    );
 
     const totalFunds =
       partyBUnallocatedBalanceForSymmId + partyBUPNLForSymmId + partyBAllocatedBalanceForSymmId;

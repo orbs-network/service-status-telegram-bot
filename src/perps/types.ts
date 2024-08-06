@@ -70,11 +70,11 @@ interface Bucket {
   initialLongShortRatio?: {
     initialLongShortRatio: DocCountHits;
   };
-  partyBUnallocatedBalance?: {
-    partyBUnallocatedBalance: DocCountHits;
+  partyBUnallocatedBalanceForSymmId?: {
+    partyBUnallocatedBalanceForSymmId: DocCountHits;
   };
-  partyBUPNL?: {
-    partyBUPNL: DocCountHits;
+  partyBUPNLForSymmId?: {
+    partyBUPNLForSymmId: DocCountHits;
   };
   partyBAllocatedBalanceForSymmId?: {
     partyBAllocatedBalanceForSymmId: DocCountHits;
