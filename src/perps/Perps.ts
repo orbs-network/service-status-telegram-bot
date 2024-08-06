@@ -28,7 +28,21 @@ export class Perps {
         throw new Error('Error fetching Kibana data');
       }
 
-      const data = (await resp.json()) as ElasticsearchResponse;
+      const todayData = (await resp.json()) as ElasticsearchResponse;
+
+      const respYesterday = await fetch(kibanaEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: getSummary(env, subDays(startDate, 1), subDays(endDate, 1)),
+      });
+
+      if (respYesterday.status !== 200) {
+        throw new Error('Error fetching Kibana data');
+      }
+
+      const yesterdayData = (await respYesterday.json()) as ElasticsearchResponse;
 
       const liqResp = await fetch(
         `${hedgerProdApiUrl}/aggregated-trades?earliestTimeMs=${startDate.getTime()}&latestTimeMs=${endDate.getTime()}&quoteStatus=LIQUIDATED&limit=1000&partyBs=0xD5A075C88A4188d666FA1e4051913BE6782982DA%2C0x614bB1F3e0Ae5A393979468ED89088F05277312c%2C0x00c069d68bc7420740460DBC3cc3fFF9b3742421`
@@ -40,7 +54,7 @@ export class Perps {
 
       const liqData = (await liqResp.json()) as any[];
 
-      output += getSummaryOutput(data, liqData);
+      output += getSummaryOutput(todayData, liqData, yesterdayData);
     } catch (err) {
       console.error('Perps report summary', err);
       output += '\nError getting summary';

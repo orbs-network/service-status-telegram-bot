@@ -3,7 +3,7 @@ import { config } from '../config';
 import { dollar } from '../utils';
 import { ElasticsearchResponse } from './types';
 
-export function getSummaryOutput(data: ElasticsearchResponse, liqData: any[]) {
+function getSummaryTotalFunds(data: ElasticsearchResponse) {
   const marginBalance =
     Number(
       data.aggregations[0].buckets[0].marginBalance?.marginBalance.hits?.hits[0].fields
@@ -28,16 +28,31 @@ export function getSummaryOutput(data: ElasticsearchResponse, liqData: any[]) {
       data.aggregations[0].buckets[0].partyBAllocatedBalance?.partyBAllocatedBalance.hits?.hits[0]
         .fields.partyBAllocatedBalanceNum[0]
     ) || 0;
-  const volume = data.aggregations[0].buckets[0].volume?.volume.value || 0;
-  const users = data.aggregations[0].buckets[0].users?.users.value || 0;
-  const trades = data.aggregations[0].buckets[0].trades?.doc_count || 0;
-  const totalFunds = marginBalance + erc20Balance + totalPartyBUnPnl + partyBAllocatedBalance;
+  return {
+    totalFunds: marginBalance + erc20Balance + totalPartyBUnPnl + partyBAllocatedBalance,
+    brokerUpnl,
+    totalPartyBUnPnl,
+  };
+}
+
+export function getSummaryOutput(
+  todayData: ElasticsearchResponse,
+  liqData: any[],
+  yesterdayData: ElasticsearchResponse
+) {
+  const { totalFunds, totalPartyBUnPnl, brokerUpnl } = getSummaryTotalFunds(todayData);
+  const { totalFunds: yesterdayTotalFunds } = getSummaryTotalFunds(yesterdayData);
+
+  const volume = todayData.aggregations[0].buckets[0].volume?.volume.value || 0;
+  const users = todayData.aggregations[0].buckets[0].users?.users.value || 0;
+  const trades = todayData.aggregations[0].buckets[0].trades?.doc_count || 0;
   const netUpnl = brokerUpnl + totalPartyBUnPnl;
   const netUpnlVolPercentage = (netUpnl / volume) * 100;
   const netUpnlFundsPercentage = (netUpnl / totalFunds) * 100;
 
   const tableOutput = [
     ['Total Funds', dollar.format(totalFunds)],
+    ['Funds Delta', dollar.format(totalFunds - yesterdayTotalFunds)],
     ['Volume', dollar.format(volume)],
     ['Trades', trades],
     ['Liqs.', liqData.length],
@@ -136,6 +151,7 @@ export function getCrossChainOutput(data: ElasticsearchResponse) {
     ['Longs', dollar.format(longNotional)],
     ['Shorts', dollar.format(shortNotional)],
     ['L/S Ratio', longShortRatio],
+    ['uPnL', dollar.format(totalPartyBUnPnl)],
   ];
 
   let output = `*CROSS CHAIN*\n`;
