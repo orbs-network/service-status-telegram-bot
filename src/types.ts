@@ -86,7 +86,7 @@ export const NotificationTypeButtons = {
   [NotificationType.PerpsDailyReport]: [
     {
       text: '🔗 View dashboard',
-      url: 'https://logs.orbs.network/app/dashboards?auth_provider_hint=anonymous1#/view/bcb99b30-4fff-11ef-b884-351c9b2f1cbe?_g=(filters%3A!()%2CrefreshInterval%3A(pause%3A!t%2Cvalue%3A0)%2Ctime%3A(from%3Anow-1w%2Cto%3Anow))',
+      url: 'https://logs.orbs.network/app/dashboards#/view/a2377f30-d722-11ee-a55c-471648dd26b9?_a=(viewMode:edit)&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-7d%2Fd,to:now))',
     },
   ],
   [NotificationType.PerpsExposureAlertsProd]: [

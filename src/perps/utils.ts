@@ -57,9 +57,6 @@ export function getSummaryOutput(
     ['Trades', trades],
     ['Liqs.', liqData.length],
     ['Users', users],
-    ['Net uPnL', dollar.format(netUpnl)],
-    ['Net uPnL to Vol', netUpnlVolPercentage.toFixed(2) + '%'],
-    ['Net uPnL to Funds', netUpnlFundsPercentage.toFixed(2) + '%'],
   ];
 
   let output = `*SUMMARY*\n`;
@@ -83,10 +80,6 @@ export function getBinanceOutput(data: ElasticsearchResponse) {
     Number(
       data.aggregations[0].buckets[0].leverage?.leverage.hits?.hits[0].fields['leverage.keyword'][0]
     ) || 0;
-  const brokerUpnl =
-    Number(
-      data.aggregations[0].buckets[0].brokerUpnl?.brokerUpnl.hits?.hits[0].fields.brokerUpnl[0]
-    ) || 0;
   const maintenanceMargin =
     Number(
       data.aggregations[0].buckets[0].maintenanceMargin?.maintenanceMargin.hits?.hits[0].fields[
@@ -95,10 +88,9 @@ export function getBinanceOutput(data: ElasticsearchResponse) {
     ) || 0;
 
   const tableOutput = [
-    ['Total Funds', dollar.format(marginBalance)],
+    ['Margin Balance', dollar.format(marginBalance)],
     ['Leverage', Number(leverage).toFixed(3)],
-    ['Maint. Mar.', dollar.format(maintenanceMargin)],
-    ['uPnL', dollar.format(brokerUpnl)],
+    ['Maint. Margin', dollar.format(maintenanceMargin)],
   ];
 
   let output = `*BINANCE*\n`;
@@ -151,7 +143,6 @@ export function getCrossChainOutput(data: ElasticsearchResponse) {
     ['Longs', dollar.format(longNotional)],
     ['Shorts', dollar.format(shortNotional)],
     ['L/S Ratio', longShortRatio],
-    ['uPnL', dollar.format(totalPartyBUnPnl)],
   ];
 
   let output = `*CROSS CHAIN*\n`;
