@@ -155,3 +155,51 @@ export function getCrossChainOutput(data: ElasticsearchResponse) {
 
   return output;
 }
+
+const symmIdLabels: Record<string, string> = {
+  '56a': 'BSC',
+  '5000a': 'MNT',
+  '42161a': 'ARB',
+};
+
+export function getPerSymmIdOutput(data: ElasticsearchResponse) {
+  let output = `*PER CHAIN*\n`;
+
+  data.aggregations[0].buckets.forEach((symmIdBucket) => {
+    const symmId = symmIdBucket.key;
+    const partyBUnallocatedBalanceForSymmId =
+      Number(
+        symmIdBucket['1']?.buckets[0].partyBUnallocatedBalance?.partyBUnallocatedBalance.hits
+          ?.hits[0].fields.partyBUnallocatedBalanceNum[0]
+      ) || 0;
+    const partyBUPNLForSymmId =
+      Number(
+        symmIdBucket['1']?.buckets[0].partyBUPNL?.partyBUPNL.hits?.hits[0].fields
+          .partyBUPNLForSymmIdNum[0]
+      ) || 0;
+    const partyBAllocatedBalanceForSymmId =
+      Number(
+        symmIdBucket['1']?.buckets[0].partyBAllocatedBalanceForSymmId
+          ?.partyBAllocatedBalanceForSymmId.hits?.hits[0].fields
+          .partyBAllocatedBalanceForSymmIdNum[0]
+      ) || 0;
+
+    const totalFunds =
+      partyBUnallocatedBalanceForSymmId + partyBUPNLForSymmId + partyBAllocatedBalanceForSymmId;
+
+    const tableOutput = [
+      ['Total Funds', dollar.format(totalFunds)],
+      ['Alloc.', dollar.format(partyBAllocatedBalanceForSymmId)],
+    ];
+
+    output += `*${symmIdLabels[symmId]}*\n`;
+    output += `\`\`\`\n${table(tableOutput, {
+      ...config.AsciiTableOpts,
+      columns: {
+        0: { width: 8, wrapWord: true },
+      },
+    })}\n\`\`\`\n\n`;
+  });
+
+  return output;
+}

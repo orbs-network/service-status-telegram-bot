@@ -33,7 +33,7 @@ interface Aggregation {
 
 interface Bucket {
   key_as_string: string;
-  key: number;
+  key: number | string;
   doc_count: number;
   volume?: DocCountValue;
   erc20Balance?: {
@@ -70,6 +70,17 @@ interface Bucket {
   initialLongShortRatio?: {
     initialLongShortRatio: DocCountHits;
   };
+  partyBUnallocatedBalance?: {
+    partyBUnallocatedBalance: DocCountHits;
+  };
+  partyBUPNL?: {
+    partyBUPNL: DocCountHits;
+  };
+  partyBAllocatedBalanceForSymmId?: {
+    partyBAllocatedBalanceForSymmId: DocCountHits;
+  };
+
+  1?: Aggregation;
 }
 
 interface DocCount {
