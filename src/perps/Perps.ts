@@ -15,7 +15,7 @@ const stagingEndpoint =
   'http://nginx-staging-lb-1142917146.ap-northeast-1.elb.amazonaws.com/analytics/v1';
 const prodEndpoint = 'http://nginx-prod-lb-501211187.ap-northeast-1.elb.amazonaws.com/analytics/v1';
 
-const hedgerProdApiUrl = 'https://staging.perps-streaming.com/analytics/v1';
+const hedgerProdApiUrl = 'https://www.perps-streaming.com/analytics/v1';
 
 export class Perps {
   static async summary(env: string, startDate: Date, endDate: Date) {
